@@ -51,5 +51,3 @@ def Meiosis_Allele(gene):
     else:
         print("Error, gene must be 0, 1 or 2")
     
-
-print(Fertilization([0], [0]))
