@@ -1,30 +1,24 @@
 # remember to download pyautogui moduel
 # or it will not work
 
-import pyautogui
+import random
 
-def CombineGamete(int firstProbability. int secondProbability):
-    finalResult = -1
-    realFirstProbability = -1
-    realSecondProbability = -1
+def Meiosis(gene):
+    
+    randomNum = random.random()
+    print(randomNum)
+    
+    if (gene == 0):
+        return 0
+    elif (gene == 1):
+        if (randomNum < 0.5):
+            return 0
+        else:
+            return 1
+    elif (gene == 2):
+        return 1
+    else:
+        print("Error, gene must be 0, 1 or 2")
+    
 
-    switch(firstProbability):
-        case 0:
-            realFirstProbability = 0
-            break
-        case 1:
-            realFirstProbability = 0.5
-            break
-        case 2:
-            realFirstProbability = 1
-            break
-    
-    # 如果是X, 為aa X aa (0 X 0)
-    # 如果是X, 為aa X Aa, Aa X aa (0 X 1 or 1 X 0)
-    # 如果是X, 為AA X aa, aa X AA (2 X 0 or 0 X 2)
-    # 如果是X, 為Aa X Aa (1 X 1)
-    # 如果是X, 為AA X AA (2 X 2)
-    
-    return 0
-    return 1
-    return 2
+print(Meiosis(3))
