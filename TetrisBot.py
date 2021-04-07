@@ -3,10 +3,20 @@
 
 import random
 
-def Meiosis(gene):
+def Meiosis(listOfGene):
+    answerGene = []
+    processingGene = listOfGene
+    length = len(processingGene)
+
+    for i in processingGene:
+        answerGene.append(Meiosis_Allele(i))
+
+    return answerGene
+    
+def Meiosis_Allele(gene):
     
     randomNum = random.random()
-    print(randomNum)
+    #print(randomNum)
     
     if (gene == 0):
         return 0
@@ -21,4 +31,4 @@ def Meiosis(gene):
         print("Error, gene must be 0, 1 or 2")
     
 
-print(Meiosis(3))
+print(Meiosis([1,1,2,1,2,0,1,2,0,2,1]))
