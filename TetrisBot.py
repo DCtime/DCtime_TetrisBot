@@ -77,6 +77,7 @@ def Meiosis_Allele(gene):
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 # "-"為空白, "*"為有東西
 # 下面為示意圖
+# 左上角是TetrisBoard[0][0], 右下是TetrisBoard[17][9]
 # ----------
 # ----------
 # ----------
@@ -110,88 +111,123 @@ for i in range(18):
 # 如果是黏在最左邊，位置為0
 
 def Place_TetrisBlock(type, rotation, location):
-	if type == "L":
+	# checkBlock[a][b], a為第a個方塊(最大3，從0開始數,順序為由左而右,第0列做完換第1列), b是0則是由上往下數位置, b是1則是由左向右數的位置
+	checkBlock = [[-1, -1], [-1, -1], [-1, -1], [-1, -1]]
+	if type == "L": # x loc not finished
 		if rotation == 0:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [0, location + 2]
+			checkBlock[3] = [1, location + 0]
 		elif rotation == 90:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [2, location + 1]
 		elif rotation == 180:
-			pass
+			checkBlock[0] = [0, location + 2]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [1, location + 2]
 		elif rotation == 270:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [2, location + 0]
+			checkBlock[3] = [2, location + 1]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "ML":
 		if rotation == 0:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [0, location + 2]
+			checkBlock[3] = [1, location + 2]
 		elif rotation == 90:
-			pass
+			checkBlock[0] = [0, location + 1]
+			checkBlock[1] = [1, location + 1]
+			checkBlock[2] = [2, location + 0]
+			checkBlock[3] = [2, location + 1]
 		elif rotation == 180:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [1, location + 2]
 		elif rotation == 270:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [1, location + 0]
+			checkBlock[3] = [2, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "Thun":
-		if rotation == 0:
-			pass
-		elif rotation == 90:
-			pass
-		elif rotation == 180:
-			pass
-		elif rotation == 270:
-			pass
+		if rotation == 0 or rotation == 180:
+			checkBlock[0] = [0, location + 1]
+			checkBlock[1] = [0, location + 2]
+			checkBlock[2] = [1, location + 0]
+			checkBlock[3] = [1, location + 1]
+		elif rotation == 90 or rotation == 270:
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [2, location + 1]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "MThun":
-		if rotation == 0:
-			pass
-		elif rotation == 90:
-			pass
-		elif rotation == 180:
-			pass
-		elif rotation == 270:
-			pass
+		if rotation == 0 or rotation == 180:
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [1, location + 2]
+		elif rotation == 90 or rotation == 270:
+			checkBlock[0] = [0, location + 1]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [2, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "T":
 		if rotation == 0:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [0, location + 2]
+			checkBlock[3] = [1, location + 1]
 		elif rotation == 90:
-			pass
+			checkBlock[0] = [0, location + 1]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [2, location + 1]
 		elif rotation == 180:
-			pass
+			checkBlock[0] = [0, location + 1]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [1, location + 2]
 		elif rotation == 270:
-			pass
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [1, location + 1]
+			checkBlock[3] = [2, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "I":
-		if rotation == 0:
-			pass
-		elif rotation == 90:
-			pass
-		elif rotation == 180:
-			pass
-		elif rotation == 270:
-			pass
+		if rotation == 0 or rotation == 180:
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [0, location + 1]
+			checkBlock[2] = [0, location + 2]
+			checkBlock[3] = [0, location + 3]
+		elif rotation == 90 or ratation == 270:
+			checkBlock[0] = [0, location + 0]
+			checkBlock[1] = [1, location + 0]
+			checkBlock[2] = [2, location + 0]
+			checkBlock[3] = [3, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
 	elif type == "S":
-		if rotation == 0:
-			pass
-		elif rotation == 90:
-			pass
-		elif rotation == 180:
-			pass
-		elif rotation == 270:
-			pass
-		else:
-			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+		checkBlock[0] = [0, location + 0]
+		checkBlock[1] = [0, location + 1]
+		checkBlock[2] = [1, location + 0]
+		checkBlock[3] = [1, location + 1]
 	else:
 		print("Type not found. Available type: L, ML, Thun, MThun, T, I, S ")
-	
-
-
 
 
 
