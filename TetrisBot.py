@@ -279,6 +279,22 @@ def CheckBoard(board, scoreBoard):
 	# 一次兩行 100分
 	# 一次三行 300分
 	# 一次四行 1200分
+	if len(cleaned) == 1:
+		scoreBoard += 40
+	elif len(cleaned) == 2:
+		scoreBoard += 100
+	elif len(cleaned) == 3:
+		scoreBoard += 300
+	elif len(cleaned) == 4:
+		scoreBoard += 1200
+		
+	# 將空著的行補起來
+	# 從最大的編號開始補
+	
+	cleaned.reverse()
+	print(cleaned)
+		
+		
 
 # 輸出整個版面
 def PrintBoard(board):
@@ -287,10 +303,9 @@ def PrintBoard(board):
 			print(board[i][j], end = "")
 		print()
 	
-Place_TetrisBlock("J", 0, 0, tetrisBoard)
-Place_TetrisBlock("J", 0, 3, tetrisBoard)
-Place_TetrisBlock("J", 0, 6, tetrisBoard)
-Place_TetrisBlock("I", 90, 9, tetrisBoard)
+
+Place_TetrisBlock("O", 0, 0, tetrisBoard)
+Place_TetrisBlock("O", 0, 2, tetrisBoard)
 PrintBoard(tetrisBoard)
 CheckBoard(tetrisBoard, tetrisBoard_Score)
 PrintBoard(tetrisBoard)
