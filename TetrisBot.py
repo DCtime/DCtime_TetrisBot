@@ -101,10 +101,13 @@ tetrisBoard = []
 
 for i in range(18):
     tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
+    
+# tetrisBoard的分數
+tetrisBoard_Score = 0
 
-# 放置俄羅斯方塊
+# 放置俄羅斯方塊函數
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
-# 俄羅斯方塊類型分七型，以字串表示：L, ML, Thun, MThun, T, I, S
+# 俄羅斯方塊類型分七型，以字串表示：L, J, S, Z, T, O, I
 # (代號意思請看我做的Google簡報)
 # 俄羅斯方塊的方向:用0, 90, 180, 270表示(單位是度)
 # 俄羅斯方塊的位置以離左側版框的距離來表示
@@ -137,7 +140,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 			checkBlock[3] = [2, location + 1]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
-	elif type == "ML":
+	elif type == "J":
 		if rotation == 0:
 			checkBlock[0] = [0, location + 0]
 			checkBlock[1] = [0, location + 1]
@@ -160,7 +163,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 			checkBlock[3] = [2, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
-	elif type == "Thun":
+	elif type == "S":
 		if rotation == 0 or rotation == 180:
 			checkBlock[0] = [0, location + 1]
 			checkBlock[1] = [0, location + 2]
@@ -173,7 +176,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 			checkBlock[3] = [2, location + 1]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
-	elif type == "MThun":
+	elif type == "Z":
 		if rotation == 0 or rotation == 180:
 			checkBlock[0] = [0, location + 0]
 			checkBlock[1] = [0, location + 1]
@@ -222,13 +225,13 @@ def Place_TetrisBlock(type, rotation, location, board):
 			checkBlock[3] = [3, location + 0]
 		else:
 			print("rotation not found. Available rotation are 0, 90, 180, and 270")
-	elif type == "S":
+	elif type == "O":
 		checkBlock[0] = [0, location + 0]
 		checkBlock[1] = [0, location + 1]
 		checkBlock[2] = [1, location + 0]
 		checkBlock[3] = [1, location + 1]
 	else:
-		print("Type not found. Available type: L, ML, Thun, MThun, T, I, S ")
+		print("Type not found. Available type: L, J, S, Z, T, I, O ")
 	
 	# 找停下來的位置
 	stop = False
@@ -255,14 +258,43 @@ def Place_TetrisBlock(type, rotation, location, board):
 				board[i[0]][i[1]] = "*"
 			break
 	
-		
+# 檢查版面(消行與計分)
+def CheckBoard(board, scoreBoard):
+	# 紀錄消掉的行的編號
+	cleaned = []
+	# 在每一行中
+	for i in range(18):
+		for j in range(10):
+			# 如果有一個空的，不理
+			if board[i][j] == "-":
+				break
+		# 如果都是"*",清掉那一行並標記起來
+		else:
+			board[i] = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+			cleaned.append(i)
+	print(cleaned)
 	
+	# 算分數
+	# 一次一行 40分
+	# 一次兩行 100分
+	# 一次三行 300分
+	# 一次四行 1200分
 
-Place_TetrisBlock("ML", 0, , tetrisBoard)
-for i in range(18):
-	for j in range(10):
-		print(tetrisBoard[i][j], end = "")
-	print()
+# 輸出整個版面
+def PrintBoard(board):
+	for i in range(18):
+		for j in range(10):
+			print(board[i][j], end = "")
+		print()
+	
+Place_TetrisBlock("J", 0, 0, tetrisBoard)
+Place_TetrisBlock("J", 0, 3, tetrisBoard)
+Place_TetrisBlock("J", 0, 6, tetrisBoard)
+Place_TetrisBlock("I", 90, 9, tetrisBoard)
+PrintBoard(tetrisBoard)
+CheckBoard(tetrisBoard, tetrisBoard_Score)
+PrintBoard(tetrisBoard)
+
 
 
 
