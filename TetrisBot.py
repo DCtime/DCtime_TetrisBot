@@ -110,10 +110,11 @@ for i in range(18):
 # 俄羅斯方塊的位置以離左側版框的距離來表示
 # 如果是黏在最左邊，位置為0
 
-def Place_TetrisBlock(type, rotation, location):
+def Place_TetrisBlock(type, rotation, location, board):
+	# 設定檢查方塊初始位置
 	# checkBlock[a][b], a為第a個方塊(最大3，從0開始數,順序為由左而右,第0列做完換第1列), b是0則是由上往下數位置, b是1則是由左向右數的位置
 	checkBlock = [[-1, -1], [-1, -1], [-1, -1], [-1, -1]]
-	if type == "L": # x loc not finished
+	if type == "L":
 		if rotation == 0:
 			checkBlock[0] = [0, location + 0]
 			checkBlock[1] = [0, location + 1]
@@ -228,9 +229,40 @@ def Place_TetrisBlock(type, rotation, location):
 		checkBlock[3] = [1, location + 1]
 	else:
 		print("Type not found. Available type: L, ML, Thun, MThun, T, I, S ")
+	
+	# 找停下來的位置
+	stop = False
+	while 1:
+		# 檢查每一個方塊
+		for i in checkBlock:
+			# 如果以碰到地板，stop = true
+			if i[0] + 1 > 17:
+				# print("STOP")
+				stop = True
+				break
+			# 每一個方塊下面是不是有東西，如果有，stop = true
+			elif board[i[0] + 1][i[1]] == "*":
+				# print("STOP")
+				stop = True
+				break
+		# 如果stop == false，全部方塊下去一階
+		if stop == False:
+			for i in checkBlock:
+				i[0] = i[0] + 1
+		# 如果stop == true，將"-"換成"*"(board)，並跳出迴圈
+		else:
+			for i in checkBlock:
+				board[i[0]][i[1]] = "*"
+			break
+	
+		
+	
 
-
-
+Place_TetrisBlock("ML", 0, , tetrisBoard)
+for i in range(18):
+	for j in range(10):
+		print(tetrisBoard[i][j], end = "")
+	print()
 
 
 
