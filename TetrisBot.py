@@ -105,10 +105,91 @@ for i in range(18):
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
 # 俄羅斯方塊類型分七型，以字串表示：L, ML, Thun, MThun, T, I, S
 # (代號意思請看我做的Google簡報)
-# 俄羅斯方塊的方向:用0, 1, 2, 3表示
-# 0為原始位置(上方所述)，1, 2, 3則是順時針轉90度，180度，270度
+# 俄羅斯方塊的方向:用0, 90, 180, 270表示(單位是度)
 # 俄羅斯方塊的位置以離左側版框的距離來表示
 # 如果是黏在最左邊，位置為0
+
+def Place_TetrisBlock(type, rotation, location):
+	if type == "L":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "ML":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "Thun":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "MThun":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "T":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "I":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	elif type == "S":
+		if rotation == 0:
+			pass
+		elif rotation == 90:
+			pass
+		elif rotation == 180:
+			pass
+		elif rotation == 270:
+			pass
+		else:
+			print("rotation not found. Available rotation are 0, 90, 180, and 270")
+	else:
+		print("Type not found. Available type: L, ML, Thun, MThun, T, I, S ")
+	
 
 
 
