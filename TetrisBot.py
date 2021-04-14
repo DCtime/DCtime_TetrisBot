@@ -77,7 +77,7 @@ def Meiosis_Allele(gene):
 
 # 放置俄羅斯方塊函數
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
-# 回傳放置位置之最大高度
+# 回傳放置位置之最大高度，並完成設定板上的放置
 # 俄羅斯方塊類型分七型，以字串表示：L, J, S, Z, T, O, I
 # (代號意思請看我做的Google簡報)
 # 俄羅斯方塊的方向:用0, 90, 180, 270表示(單位是度)
@@ -237,7 +237,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 	return (height)
 
 # 檢查版面函數(消行與計分)
-# 會回傳此檢查所獲得的分數
+# 會回傳此檢查所獲得的分數，並完成設定板上的消除
 def CheckBoard(board):
 	# 紀錄消掉的行的編號
 	cleaned = []
@@ -292,7 +292,7 @@ def CheckBoard(board):
 			
 	return score
 	
-# 將做一個放俄羅斯方塊的動作整合起來
+# 將做一個放俄羅斯方塊的動作整合起來，會影響板上的樣子
 # 回傳分數變化、最後洞的數量、放置方塊之最大高度
 def Tetris_Movement(type, rotation, location, board):
 	height = Place_TetrisBlock(type, rotation, location, board)
@@ -326,7 +326,53 @@ def PrintBoard(board):
 		for j in range(10):
 			print(board[i][j], end = "")
 		print()
-		
+
+# 糟糕分數計算機
+def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
+	testBoard = []
+	for level in board:
+		testBoard.append(level)
+	# 儲存此動作回傳的數值
+	tetrisMovementTemp = []
+	# 分數變化量
+	delta_score = 0
+	# 放置前洞的數量
+	previous_holes = Holes_Quantity(testBoard)
+	# 放置後洞的變化
+	delta_holes = 0
+	# 放置方塊的最大高度
+	height = 0
+	
+	# 放置方塊，並把回傳的東西放到tetrisMovementTemp
+	tetrisMovementTemp = Tetris_Movement(block1[0], block1[1], block1[2], testBoard)
+	# 計算分數變化量
+	delta_score += tetrisMovementTemp[0]
+	# 計算產生的洞洞數
+	delta_holes += tetrisMovementTemp[1] - previous_holes
+	# 高度存入height
+	height += tetrisMovementTemp[2]
+	
+	# 放置方塊，並把回傳的東西放到tetrisMovementTemp
+	tetrisMovementTemp = Tetris_Movement(block2[0], block2[1], block2[2], testBoard)
+	# 計算分數變化量
+	delta_score += tetrisMovementTemp[0]
+	# 計算產生的洞洞數
+	delta_holes += tetrisMovementTemp[1] - previous_holes
+	# 高度存入height
+	height += tetrisMovementTemp[2]
+	
+	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score * scoreWeight
+	
+# 版面測試器(not finizhed)
+# 輸入欲測試的版面與下兩個俄羅斯方塊
+# 回傳每個可能的總製造的洞洞數量與放置最大高度的和
+# 回傳格式為[fRotation, fLocation, sRotation, sLocation, sumHoles, sumHeight]的陣列
+def Test_Board(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
+	bestMove = []
+	lowestBadScore = 9999999999
+	
+	return
+	
 # =====================主程式========================
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 # "-"為空白, "*"為有東西
@@ -388,10 +434,6 @@ height = 0
 # print(tetrisBoard_score, delta_holes, height)
 # 可用此方法列印現在之版面
 # PrintBoard(tetrisBoard)
-
-	
-
-
 
 
 
