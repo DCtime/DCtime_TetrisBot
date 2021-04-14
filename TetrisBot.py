@@ -87,6 +87,8 @@ def Place_TetrisBlock(type, rotation, location, board):
 	# 設定檢查方塊初始位置
 	# checkBlock[a][b], a為第a個方塊(最大3，從0開始數,順序為由左而右,第0列做完換第1列), b是0則是由上往下數位置, b是1則是由左向右數的位置
 	checkBlock = [[-1, -1], [-1, -1], [-1, -1], [-1, -1]]
+	# 儲存放置方塊之最大高度
+	height = 0
 	if type == "L":
 		if rotation == 0:
 			checkBlock[0] = [0, location + 0]
@@ -227,8 +229,9 @@ def Place_TetrisBlock(type, rotation, location, board):
 			for i in checkBlock:
 				board[i[0]][i[1]] = "*"
 			break
-	
-# 檢查版面(消行與計分)
+
+
+# 檢查版面函數(消行與計分)
 # 會回傳此檢查所獲得的分數
 def CheckBoard(board):
 	# 紀錄消掉的行的編號
@@ -283,7 +286,19 @@ def CheckBoard(board):
 		#print("------------------------------------------------")
 			
 	return score
-
+	
+# 將做一個放俄羅斯方塊的動作整合起來
+# 回傳分數變化、製造洞的數量、放置方塊之最大高度
+def Tetris_Movement(type, rotation, location, board):
+	Place_TetrisBlock(type, rotation, location, board)
+	return CheckBoard(board)
+	
+# 洞洞計數器
+def Holes_Quantity(board):
+	# 存放洞洞數量
+	holes = 0
+	return holes
+	
 # 輸出整個版面
 def PrintBoard(board):
 	for i in range(18):
@@ -291,6 +306,7 @@ def PrintBoard(board):
 			print(board[i][j], end = "")
 		print()
 		
+# =====================主程式========================
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 # "-"為空白, "*"為有東西
 # 下面為示意圖
