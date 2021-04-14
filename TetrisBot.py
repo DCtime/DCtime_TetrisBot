@@ -332,6 +332,8 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	testBoard = []
 	for level in board:
 		testBoard.append(level)
+	print("badscorecal former,testBoard:")
+	PrintBoard(board)
 	# 儲存此動作回傳的數值
 	tetrisMovementTemp = []
 	# 分數變化量
@@ -361,17 +363,31 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	# 高度存入height
 	height += tetrisMovementTemp[2]
 	
+	print("badscorecal lattertestBoard:")
+	PrintBoard(testBoard)
+	
 	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score * scoreWeight
 	
-# 版面測試器(not finizhed)
+# 版面測試器(board clone bug found)
 # 輸入欲測試的版面與下兩個俄羅斯方塊
 # 回傳每個可能的總製造的洞洞數量與放置最大高度的和
 # 回傳格式為[fRotation, fLocation, sRotation, sLocation, sumHoles, sumHeight]的陣列
-def Test_Board(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
+def FindBestMove(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
 	bestMove = []
 	lowestBadScore = 9999999999
-	
-	return
+	tempBadScore = 0
+	for x1 in range(8):
+		for x2 in range(8):
+			for r1 in range(0, 271, 90):
+				for r2 in range(0, 271, 90):
+					tempBadScore = BadScoreCal(board, [fBlock, 0, x1], [sBlock, 0, x2], holeWeight, heightWeight, scoreWeight)
+					print("tempBadScore:", tempBadScore)
+					print("lowestBadScore:", lowestBadScore)
+					if tempBadScore < lowestBadScore:
+						lowestBadScore = tempBadScore
+						bestMove = [fBlock, 0, x1]
+						
+	return bestMove
 	
 # =====================主程式========================
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
@@ -436,9 +452,9 @@ height = 0
 # PrintBoard(tetrisBoard)
 
 
-
-
-
+print(BadScoreCal(tetrisBoard, ["O", 0, 0], ["O", 0, 0], 1, 1, 1))
+print(BadScoreCal(tetrisBoard, ["O", 0, 0], ["O", 0, 0], 1, 1, 1))
+PrintBoard(tetrisBoard)
 
 
 
