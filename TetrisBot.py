@@ -74,36 +74,6 @@ def Meiosis_Allele(gene):
 
 # 下一步製作俄羅斯方塊模擬器
 # --------------------關於俄羅斯方塊的函數----------------------------
-# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
-# "-"為空白, "*"為有東西
-# 下面為示意圖
-# 左上角是TetrisBoard[0][0], 右下是TetrisBoard[17][9]
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ---------- 
-# ----------
-# ----------
-# ***---**--
-# --*---**--
-# --********
-# *********-
-tetrisBoard = []
-
-for i in range(18):
-    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
-    
-# tetrisBoard的分數
-tetrisBoard_Score = 0
 
 # 放置俄羅斯方塊函數
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
@@ -259,7 +229,8 @@ def Place_TetrisBlock(type, rotation, location, board):
 			break
 	
 # 檢查版面(消行與計分)
-def CheckBoard(board, scoreBoard):
+# 會回傳此檢查所獲得的分數
+def CheckBoard(board):
 	# 紀錄消掉的行的編號
 	cleaned = []
 	# 在每一行中
@@ -272,29 +243,46 @@ def CheckBoard(board, scoreBoard):
 		else:
 			board[i] = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 			cleaned.append(i)
-	print(cleaned)
+	# print(cleaned)
 	
 	# 算分數
 	# 一次一行 40分
 	# 一次兩行 100分
 	# 一次三行 300分
 	# 一次四行 1200分
+	# print(len(cleaned))
+	score = 0
+	
 	if len(cleaned) == 1:
-		scoreBoard += 40
+		score = 40
 	elif len(cleaned) == 2:
-		scoreBoard += 100
+		score = 100
 	elif len(cleaned) == 3:
-		scoreBoard += 300
+		score = 300
 	elif len(cleaned) == 4:
-		scoreBoard += 1200
+		score = 1200
 		
 	# 將空著的行補起來
-	# 從最大的編號開始補
+	# 從最小的編號開始補
 	
-	cleaned.reverse()
-	print(cleaned)
-		
-		
+	# print(cleaned)
+	
+	for level in cleaned:
+		# print("level:", level)
+		for i in range(level):
+			# print("level - i:",level - i)
+			for j in range(10):
+				board[level - i][j] = board[level - i - 1][j]
+		for j in range(10):
+			board[0][j] = "-"
+			
+		#for i in range(18):
+		#	for j in range(10):
+		#		print(tetrisBoard[i][j], end = "")
+		#	print()
+		#print("------------------------------------------------")
+			
+	return score
 
 # 輸出整個版面
 def PrintBoard(board):
@@ -302,13 +290,43 @@ def PrintBoard(board):
 		for j in range(10):
 			print(board[i][j], end = "")
 		print()
+		
+# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
+# "-"為空白, "*"為有東西
+# 下面為示意圖
+# 左上角是TetrisBoard[0][0], 右下是TetrisBoard[17][9]
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ----------
+# ---------- 
+# ----------
+# ----------
+# ----------
+# ----------
+# -----------
+# -----------
+tetrisBoard = []
+
+for i in range(18):
+    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
+    
+# tetrisBoard的分數
+tetrisBoard_Score = 0
+
 	
 
-Place_TetrisBlock("O", 0, 0, tetrisBoard)
-Place_TetrisBlock("O", 0, 2, tetrisBoard)
-PrintBoard(tetrisBoard)
-CheckBoard(tetrisBoard, tetrisBoard_Score)
-PrintBoard(tetrisBoard)
+
+
+
 
 
 
