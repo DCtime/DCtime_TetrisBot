@@ -77,6 +77,7 @@ def Meiosis_Allele(gene):
 
 # 放置俄羅斯方塊函數
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
+# 回傳放置位置之最大高度
 # 俄羅斯方塊類型分七型，以字串表示：L, J, S, Z, T, O, I
 # (代號意思請看我做的Google簡報)
 # 俄羅斯方塊的方向:用0, 90, 180, 270表示(單位是度)
@@ -228,8 +229,10 @@ def Place_TetrisBlock(type, rotation, location, board):
 		else:
 			for i in checkBlock:
 				board[i[0]][i[1]] = "*"
+				if i[0] > height:
+					height = i[0]
 			break
-
+	return height
 
 # 檢查版面函數(消行與計分)
 # 會回傳此檢查所獲得的分數
@@ -288,10 +291,12 @@ def CheckBoard(board):
 	return score
 	
 # 將做一個放俄羅斯方塊的動作整合起來
-# 回傳分數變化、製造洞的數量、放置方塊之最大高度
+# 回傳分數變化、最後洞的數量、放置方塊之最大高度
 def Tetris_Movement(type, rotation, location, board):
-	Place_TetrisBlock(type, rotation, location, board)
-	return CheckBoard(board)
+	height = Place_TetrisBlock(type, rotation, location, board)
+	delta_score = CheckBoard(board)
+	holes = Holes_Quantity(board)
+	return [delta_score, holes, height]
 	
 # 洞洞計數器
 # 輸入欲搜尋之版面，回傳製造之洞洞數量
@@ -350,14 +355,16 @@ for i in range(18):
     tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
     
 # tetrisBoard的分數
-tetrisBoard_Score = 0
+tetrisBoard_score = 0
 
-tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
-tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
-tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
-tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
+tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
+tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
+tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
+tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
 PrintBoard(tetrisBoard)
 print(Holes_Quantity(tetrisBoard))
+
+print(tetrisBoard_score)
 
 
 	
