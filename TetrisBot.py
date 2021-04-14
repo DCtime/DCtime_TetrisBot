@@ -229,10 +229,12 @@ def Place_TetrisBlock(type, rotation, location, board):
 		else:
 			for i in checkBlock:
 				board[i[0]][i[1]] = "*"
-				if i[0] > height:
-					height = i[0]
+				# print("i[0]", i[0])
+				if 18 - i[0] > height: # y方向越低越高
+					height =18 - i[0]
+					# print("height :", height)
 			break
-	return height
+	return (height)
 
 # 檢查版面函數(消行與計分)
 # 會回傳此檢查所獲得的分數
@@ -353,19 +355,39 @@ tetrisBoard = []
 
 for i in range(18):
     tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
-    
+
+# tetrisMovementTemp
+# 儲存此動作回傳的數值
+tetrisMovementTemp = []
+
 # tetrisBoard的分數
 tetrisBoard_score = 0
 
-tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
-tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
-tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
-tetrisBoard_score += Tetris_Movement("J", 180, 0, tetrisBoard)[0]
-PrintBoard(tetrisBoard)
-print(Holes_Quantity(tetrisBoard))
+# 放置前洞的數量
+previous_holes = 0
 
-print(tetrisBoard_score)
+# 放置後洞的變化
+delta_holes = 0
 
+# 放置方塊的最大高度
+height = 0
+
+# ~~~~Tetris_Movement使用方法:~~~~~~
+# 放置方塊，並把回傳的東西放到tetrisMovementTemp
+# tetrisMovementTemp = Tetris_Movement("L", 90, 0, tetrisBoard)
+# 計算最後的分數
+# tetrisBoard_score += tetrisMovementTemp[0]
+# 計算產生的洞洞數
+# delta_holes = tetrisMovementTemp[1] - previous_holes
+# 將現在洞洞的數量儲存起來，等下一次放置俄羅斯方塊使用
+# previous_holes = tetrisMovementTemp[1]
+# 高度存入height
+# height = tetrisMovementTemp[2]
+
+# 使用完後改變的變數:分數、洞的變化、最大高度
+# print(tetrisBoard_score, delta_holes, height)
+# 可用此方法列印現在之版面
+# PrintBoard(tetrisBoard)
 
 	
 
