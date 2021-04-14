@@ -294,9 +294,23 @@ def Tetris_Movement(type, rotation, location, board):
 	return CheckBoard(board)
 	
 # 洞洞計數器
+# 輸入欲搜尋之版面，回傳製造之洞洞數量
 def Holes_Quantity(board):
 	# 存放洞洞數量
 	holes = 0
+	for x in range(10):
+		#print("checking x:", x)
+		for y in range(18):
+			#print("	checking y:", y)
+			if board[y][x] == "*":
+				#print("		found surface y:", y)
+				for y2 in range(y, 18, 1):
+					#print("			searching holes y:", y2)
+					if board[y2][x] == "-":
+						#print("				found holes x:", y2)
+						holes += 1
+				break
+		
 	return holes
 	
 # 輸出整個版面
@@ -337,6 +351,14 @@ for i in range(18):
     
 # tetrisBoard的分數
 tetrisBoard_Score = 0
+
+tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
+tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
+tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
+tetrisBoard_Score += Tetris_Movement("J", 180, 0, tetrisBoard)
+PrintBoard(tetrisBoard)
+print(Holes_Quantity(tetrisBoard))
+
 
 	
 
