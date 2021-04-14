@@ -330,10 +330,13 @@ def PrintBoard(board):
 # 糟糕分數計算機
 def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	testBoard = []
-	for level in board:
-		testBoard.append(level)
-	print("badscorecal former,testBoard:")
-	PrintBoard(board)
+	xtemp = []
+	for y in range(18):
+		for x in range(10):
+			xtemp.append(board[y][x])
+		testBoard.append(xtemp)
+		xtemp = []
+			
 	# 儲存此動作回傳的數值
 	tetrisMovementTemp = []
 	# 分數變化量
@@ -344,7 +347,7 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	delta_holes = 0
 	# 放置方塊的最大高度
 	height = 0
-	
+
 	# 放置方塊，並把回傳的東西放到tetrisMovementTemp
 	tetrisMovementTemp = Tetris_Movement(block1[0], block1[1], block1[2], testBoard)
 	# 計算分數變化量
@@ -363,8 +366,6 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	# 高度存入height
 	height += tetrisMovementTemp[2]
 	
-	print("badscorecal lattertestBoard:")
-	PrintBoard(testBoard)
 	
 	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score * scoreWeight
 	
@@ -380,12 +381,12 @@ def FindBestMove(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
 		for x2 in range(8):
 			for r1 in range(0, 271, 90):
 				for r2 in range(0, 271, 90):
-					tempBadScore = BadScoreCal(board, [fBlock, 0, x1], [sBlock, 0, x2], holeWeight, heightWeight, scoreWeight)
+					tempBadScore = BadScoreCal(board, [fBlock, r1, x1], [sBlock, r2, x2], holeWeight, heightWeight, scoreWeight)
 					print("tempBadScore:", tempBadScore)
 					print("lowestBadScore:", lowestBadScore)
 					if tempBadScore < lowestBadScore:
 						lowestBadScore = tempBadScore
-						bestMove = [fBlock, 0, x1]
+						bestMove = [fBlock, r1, x1]
 						
 	return bestMove
 	
@@ -451,12 +452,7 @@ height = 0
 # 可用此方法列印現在之版面
 # PrintBoard(tetrisBoard)
 
-
-print(BadScoreCal(tetrisBoard, ["O", 0, 0], ["O", 0, 0], 1, 1, 1))
-print(BadScoreCal(tetrisBoard, ["O", 0, 0], ["O", 0, 0], 1, 1, 1))
-PrintBoard(tetrisBoard)
-
-
+print(FindBestMove(tetrisBoard, "J", "O", 1, 1, 1))
 
 
 
