@@ -2,6 +2,7 @@
 # or it will not work
 
 import random
+import time
 
 # 製造行為方程式
 # 製作第一個基因組
@@ -75,7 +76,7 @@ def Meiosis_Allele(gene):
 # 下一步製作俄羅斯方塊模擬器
 # --------------------關於俄羅斯方塊的函數----------------------------
 
-# 放置俄羅斯方塊函數
+# 放置俄羅斯方塊函數(被TetrisMovement使用)
 # 輸入俄羅斯方塊類型，俄羅斯方塊方向，俄羅斯方塊位置
 # 回傳放置位置之最大高度，並完成設定板上的放置
 # 俄羅斯方塊類型分七型，以字串表示：L, J, S, Z, T, O, I
@@ -191,7 +192,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 			checkBlock[1] = [0, location + 1]
 			checkBlock[2] = [0, location + 2]
 			checkBlock[3] = [0, location + 3]
-		elif rotation == 90 or ratation == 270:
+		elif rotation == 90 or rotation == 270:
 			checkBlock[0] = [0, location + 0]
 			checkBlock[1] = [1, location + 0]
 			checkBlock[2] = [2, location + 0]
@@ -236,7 +237,7 @@ def Place_TetrisBlock(type, rotation, location, board):
 			break
 	return (height)
 
-# 檢查版面函數(消行與計分)
+# 檢查版面函數(消行與計分)(被TetrisMovement使用)
 # 會回傳此檢查所獲得的分數，並完成設定板上的消除
 def CheckBoard(board):
 	# 紀錄消掉的行的編號
@@ -292,15 +293,7 @@ def CheckBoard(board):
 			
 	return score
 	
-# 將做一個放俄羅斯方塊的動作整合起來，會影響板上的樣子
-# 回傳分數變化、最後洞的數量、放置方塊之最大高度
-def Tetris_Movement(type, rotation, location, board):
-	height = Place_TetrisBlock(type, rotation, location, board)
-	delta_score = CheckBoard(board)
-	holes = Holes_Quantity(board)
-	return [delta_score, holes, height]
-	
-# 洞洞計數器
+# 洞洞計數器(被TetrisMovement使用)
 # 輸入欲搜尋之版面，回傳製造之洞洞數量
 def Holes_Quantity(board):
 	# 存放洞洞數量
@@ -320,6 +313,32 @@ def Holes_Quantity(board):
 		
 	return holes
 	
+	
+# 將做一個放俄羅斯方塊的動作整合起來，會影響板上的樣子((被BadScoreCal使用))
+# 回傳分數變化、最後洞的數量、放置方塊之最大高度
+# ~~~~Tetris_Movement使用方法:~~~~~~
+# 放置方塊，並把回傳的東西放到tetrisMovementTemp
+# tetrisMovementTemp = Tetris_Movement("L", 90, 0, tetrisBoard)
+# 計算最後的分數
+# tetrisBoard_score += tetrisMovementTemp[0]
+# 計算產生的洞洞數
+# delta_holes = tetrisMovementTemp[1] - previous_holes
+# 將現在洞洞的數量儲存起來，等下一次放置俄羅斯方塊使用
+# previous_holes = tetrisMovementTemp[1]
+# 高度存入height
+# height = tetrisMovementTemp[2]
+
+# 使用完後改變的變數:分數、洞的變化、最大高度
+# print(tetrisBoard_score, delta_holes, height)
+# 可用此方法列印現在之版面
+# PrintBoard(tetrisBoard)
+def Tetris_Movement(type, rotation, location, board):
+	height = Place_TetrisBlock(type, rotation, location, board)
+	delta_score = CheckBoard(board)
+	holes = Holes_Quantity(board)
+	return [delta_score, holes, height]
+	
+
 # 輸出整個版面
 def PrintBoard(board):
 	for i in range(18):
@@ -327,7 +346,8 @@ def PrintBoard(board):
 			print(board[i][j], end = "")
 		print()
 
-# 糟糕分數計算機
+# 糟糕分數計算機(不會引響版面)
+# block1 block2 為陣列 [type, rotation, location]
 def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	testBoard = []
 	xtemp = []
@@ -369,27 +389,55 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	
 	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score * scoreWeight
 	
-# 版面測試器(board clone bug found)
-# 輸入欲測試的版面與下兩個俄羅斯方塊
-# 回傳每個可能的總製造的洞洞數量與放置最大高度的和
-# 回傳格式為[fRotation, fLocation, sRotation, sLocation, sumHoles, sumHeight]的陣列
+# 尋找最佳動作函數(不會引響版面)
+# 輸入欲測試的版面與下兩個俄羅斯方塊與倍率
+# 回傳最好的放置方式
+# 回傳格式為[fType, fRotation, fLocation]的陣列
 def FindBestMove(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
 	bestMove = []
 	lowestBadScore = 9999999999
 	tempBadScore = 0
-	for x1 in range(8):
-		for x2 in range(8):
+	# 所有狀況
+	for x1 in range(10):
+		for x2 in range(10):
 			for r1 in range(0, 271, 90):
 				for r2 in range(0, 271, 90):
-					tempBadScore = BadScoreCal(board, [fBlock, r1, x1], [sBlock, r2, x2], holeWeight, heightWeight, scoreWeight)
-					print("tempBadScore:", tempBadScore)
-					print("lowestBadScore:", lowestBadScore)
+					try: 
+						tempBadScore = BadScoreCal(board, [fBlock, r1, x1], [sBlock, r2, x2], holeWeight, heightWeight, scoreWeight)
+					except IndexError: # 如果那個地方根本不能放
+						# print("Index out of range")
+						break
+					# 此動作糟糕分數與全部最佳分數(最低)
+					# print("tempBadScore:", tempBadScore)
+					# print("lowestBadScore:", lowestBadScore)
+					# 如果現分數是全部最佳分數
 					if tempBadScore < lowestBadScore:
 						lowestBadScore = tempBadScore
+						# 把這個步驟儲存起來
 						bestMove = [fBlock, r1, x1]
-						
+	# 印出此動作最佳成績
+	print("lowestBadScore:", lowestBadScore)		
 	return bestMove
 	
+# 俄羅斯方塊題目製造機(回傳L, J, S, Z, T, O, I)
+def TetrisQuestionMaker():
+	rand = (int)(random.random() * 10000000000000000 % 7)
+	if rand == 0:
+		return "L"
+	elif rand == 1:
+		return "J"
+	elif rand == 2:
+		return "S"
+	elif rand == 3:
+		return "Z"
+	elif rand == 4:
+		return "T"
+	elif rand == 5:
+		return "O"
+	elif rand == 6:
+		return "I"
+	else:
+		print("random must be 0 - 6")
 # =====================主程式========================
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 # "-"為空白, "*"為有東西
@@ -419,40 +467,42 @@ tetrisBoard = []
 for i in range(18):
     tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
 
-# tetrisMovementTemp
-# 儲存此動作回傳的數值
-tetrisMovementTemp = []
-
 # tetrisBoard的分數
 tetrisBoard_score = 0
 
-# 放置前洞的數量
-previous_holes = 0
+# 此掉落之俄羅斯方塊
+currentBlock = TetrisQuestionMaker()
+# 下一個俄羅斯方塊
+nextBlock = TetrisQuestionMaker()
+# ----------------------------player statisics--------------------------------
+holeWeight = 50
+heightWeight = 50
+scoreWeight = 50
 
-# 放置後洞的變化
-delta_holes = 0
+time.sleep(0)
+move = []
+while 1:
+	move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
+	tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
+	PrintBoard(tetrisBoard)
+	print("Score:", tetrisBoard_score)
+	
+	currentBlock = nextBlock
+	nextBlock = TetrisQuestionMaker()
+	print("current:", currentBlock)
+	print("next", nextBlock)
+	print("==============================================")
+	
+	if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
+		print("Game Over")
+		print("Final Score:", tetrisBoard_score)
+		break
+		
+	time.sleep(0)
+	
+	
 
-# 放置方塊的最大高度
-height = 0
 
-# ~~~~Tetris_Movement使用方法:~~~~~~
-# 放置方塊，並把回傳的東西放到tetrisMovementTemp
-# tetrisMovementTemp = Tetris_Movement("L", 90, 0, tetrisBoard)
-# 計算最後的分數
-# tetrisBoard_score += tetrisMovementTemp[0]
-# 計算產生的洞洞數
-# delta_holes = tetrisMovementTemp[1] - previous_holes
-# 將現在洞洞的數量儲存起來，等下一次放置俄羅斯方塊使用
-# previous_holes = tetrisMovementTemp[1]
-# 高度存入height
-# height = tetrisMovementTemp[2]
-
-# 使用完後改變的變數:分數、洞的變化、最大高度
-# print(tetrisBoard_score, delta_holes, height)
-# 可用此方法列印現在之版面
-# PrintBoard(tetrisBoard)
-
-print(FindBestMove(tetrisBoard, "J", "O", 1, 1, 1))
 
 
 
