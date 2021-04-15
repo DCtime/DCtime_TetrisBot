@@ -509,14 +509,21 @@ def calWeights(geneArray):
 			calWeightTemp += geneArray[group][gene]
 		weights.append(calWeightTemp)
 	return weights
+	
+def MakeBabies(genes):
+	trialingGenes = []
+	for geneCounter in range(100):
+		trialingGene = []
+		for groupCounter in range(len(genes)):
+			trialingGene.append(Fertilization(genes[groupCounter], genes[groupCounter]))
+		trialingGenes.append(trialingGene)
+	return trialingGenes
 # =====================主程式========================
 # 製作三個特徵基因組，格式為[holeGene, heightGene, scoreGene]
 # holeGene, heightGene, scoreGene都為012所組成的陣列
 bestGene = [Make_First_Gene(100), Make_First_Gene(100), Make_First_Gene(100)]
-trialingGene = []
-for groupCounter in range(len(bestGene)):
-	trialingGene.append(Fertilization(bestGene[groupCounter], bestGene[groupCounter]))
-print(calWeights(trialingGene))
+
+print(len(MakeBabies(bestGene)))
 	
 	
 
