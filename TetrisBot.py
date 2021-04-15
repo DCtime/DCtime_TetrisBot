@@ -438,67 +438,85 @@ def TetrisQuestionMaker():
 		return "I"
 	else:
 		print("random must be 0 - 6")
-# =====================主程式========================
-# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
-# "-"為空白, "*"為有東西
-# 下面為示意圖
-# 左上角是TetrisBoard[0][0], 右下是TetrisBoard[17][9]
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ----------
-# ---------- 
-# ----------
-# ----------
-# ----------
-# ----------
-# -----------
-# -----------
-tetrisBoard = []
-
-for i in range(18):
-    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
-
-# tetrisBoard的分數
-tetrisBoard_score = 0
-
-# 此掉落之俄羅斯方塊
-currentBlock = TetrisQuestionMaker()
-# 下一個俄羅斯方塊
-nextBlock = TetrisQuestionMaker()
-# ----------------------------player statisics--------------------------------
-holeWeight = 50
-heightWeight = 50
-scoreWeight = 50
-
-time.sleep(0)
-move = []
-while 1:
-	move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
-	tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
-	PrintBoard(tetrisBoard)
-	print("Score:", tetrisBoard_score)
+# --------------------------------------------訓練函數-----------------------------------------------
+def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
+	# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
+	# "-"為空白, "*"為有東西
+	# 下面為示意圖
+	# 左上角是TetrisBoard[0][0], 右下是TetrisBoard[17][9]
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# ---------- 
+	# ----------
+	# ----------
+	# ----------
+	# ----------
+	# -----------
+	# -----------
+	tetrisBoard = []
 	
-	currentBlock = nextBlock
+	for i in range(18):
+	    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
+	
+	# tetrisBoard的分數
+	tetrisBoard_score = 0
+	
+	# 此掉落之俄羅斯方塊
+	currentBlock = TetrisQuestionMaker()
+	# 下一個俄羅斯方塊
 	nextBlock = TetrisQuestionMaker()
-	print("current:", currentBlock)
-	print("next", nextBlock)
-	print("==============================================")
+	# ----------------------------player statisics--------------------------------
+	holeWeight = _holeWeight
+	heightWeight = _heightWeight
+	scoreWeight = _scoreWeight
 	
-	if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
-		print("Game Over")
-		print("Final Score:", tetrisBoard_score)
-		break
-		
 	time.sleep(0)
+	move = []
+	while 1:
+		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
+		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
+		PrintBoard(tetrisBoard)
+		print("Score:", tetrisBoard_score)
+		
+		currentBlock = nextBlock
+		nextBlock = TetrisQuestionMaker()
+		print("current:", currentBlock)
+		print("next", nextBlock)
+		print("==============================================")
+		
+		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
+			print("Game Over")
+			print("Final Score:", tetrisBoard_score)
+			return tetrisBoard_score
+
+# 輸入基因，回傳每組基因的顯性數量(陣列)
+# 格式為[[], [], [], ...]
+def calWeights(geneArray):
+	weights = []
+	for group in range(len(geneArray)):
+		calWeightTemp = 0
+		for gene in range(100):
+			calWeightTemp += geneArray[group][gene]
+		weights.append(calWeightTemp)
+	return weights
+# =====================主程式========================
+# 製作三個特徵基因組，格式為[holeGene, heightGene, scoreGene]
+# holeGene, heightGene, scoreGene都為012所組成的陣列
+bestGene = [Make_First_Gene(100), Make_First_Gene(100), Make_First_Gene(100)]
+trialingGene = []
+for groupCounter in range(len(bestGene)):
+	trialingGene.append(Fertilization(bestGene[groupCounter], bestGene[groupCounter]))
+print(calWeights(trialingGene))
 	
 	
 
