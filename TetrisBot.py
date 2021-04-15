@@ -387,7 +387,7 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 	height += tetrisMovementTemp[2]
 	
 	
-	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score * scoreWeight
+	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score // 20 * scoreWeight
 	
 # 尋找最佳動作函數(不會引響版面)
 # 輸入欲測試的版面與下兩個俄羅斯方塊與倍率
@@ -416,7 +416,7 @@ def FindBestMove(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
 						# 把這個步驟儲存起來
 						bestMove = [fBlock, r1, x1]
 	# 印出此動作最佳成績
-	print("lowestBadScore:", lowestBadScore)		
+	# print("lowestBadScore:", lowestBadScore)		
 	return bestMove
 	
 # 俄羅斯方塊題目製造機(回傳L, J, S, Z, T, O, I)
@@ -439,7 +439,20 @@ def TetrisQuestionMaker():
 	else:
 		print("random must be 0 - 6")
 # --------------------------------------------訓練函數-----------------------------------------------
-def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
+# 輸入權重，回傳得到的遊戲分數
+# holeWeight厭洞權重 
+# heightWeight厭高權重
+# scoreWeight厭分數權重
+# maxMove決定分數之最少步數(沒時間玩到死)
+# 剩下都只是用來顯示在版面上，沒有參與計算
+# no 現在為第幾個寶寶
+# generation 現在是第幾代
+# maxNo 每帶代有幾個寶寶
+# maxGeneration 這次測試有幾代
+# highScore這代最高分數是啥
+# bestWeights 這代最高分是誰
+# weights 現在玩遊戲的寶寶之權重
+def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None, weights=None):
 	# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 	# "-"為空白, "*"為有東西
 	# 下面為示意圖
@@ -475,18 +488,18 @@ def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
 	currentBlock = TetrisQuestionMaker()
 	# 下一個俄羅斯方塊
 	nextBlock = TetrisQuestionMaker()
-	# ----------------------------player statisics--------------------------------
-	holeWeight = _holeWeight
-	heightWeight = _heightWeight
-	scoreWeight = _scoreWeight
 	
 	time.sleep(0)
 	move = []
-	while 1:
+	for moveCounter in range(maxMove):
 		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
 		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
+		print("==============================================")
+		print("Generation:", generation, "/", maxGeneration)
+		print("No.", no, "/", maxNo, "( Weights:", weights, ")")
+		print("Moves:", moveCounter + 1, "/", maxMove)
 		PrintBoard(tetrisBoard)
-		print("Score:", tetrisBoard_score)
+		print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
 		
 		currentBlock = nextBlock
 		nextBlock = TetrisQuestionMaker()
@@ -499,6 +512,13 @@ def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
 			print("Game Over")
 			print("Final Score:", tetrisBoard_score)
 			return tetrisBoard_score
+	
+	print("==========================================================")
+	print("]]]]]]]]]]] ", weights, " Final Score:", tetrisBoard_score, "[[[[[[[[[[[[")
+	print("==========================================================")
+		
+	time.sleep(2)
+	return tetrisBoard_score
 
 # 輸入基因，回傳每組基因的顯性數量(陣列)
 # 格式為[[], [], [], ...]
@@ -521,22 +541,39 @@ def MakeBabies(genes, n):
 		trialingGenes.append(trialingGene)
 	return trialingGenes
 # =====================主程式========================
-# 製作三個特徵基因組，格式為[holeGene, heightGene, scoreGene]
-# holeGene, heightGene, scoreGene都為012所組成的陣列
-motherGene = [Make_First_Gene(100), Make_First_Gene(100), Make_First_Gene(100)]
+# maxMove 一個遊戲結算之步數
+# maxNo 一個子代生的數量
+# maxGeneration 要生幾個世代
+# AlleleQuantity 個體之每個特徵等為基因數量
+maxMove = 100
+maxNo = 10
+maxGeneration = 5
+AlleleQuantity= 100
 
-highScore = 0
-bestGene = 0
-babies = MakeBabies(motherGene, 3)
-for baby in babies:
-	Weights = CalWeights(baby)
-	currentScore = GetGeneScore(Weights[0], Weights[1], Weights[2])
-	if currentScore > highScore:
-		highScore = currentScore
-		bestGene = baby
+bestGene = [Make_First_Gene(AlleleQuantity), Make_First_Gene(AlleleQuantity), Make_First_Gene(AlleleQuantity)]
+print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+print("Mother Gene:", CalWeights(bestGene))
+print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+time.sleep(3)
 
-print(CalWeights(bestGene))
-print("highscore", highScore)
+for generationCounter in range(maxGeneration):
+	highScore = 0
+	babies = MakeBabies(bestGene, maxNo)
+	for babyCounter in range(len(babies)):
+		weights = CalWeights(babies[babyCounter])
+		# (holeWeight, heightWeight, scoreWeight, maxMove, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None)
+		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights)
+		if currentScore > highScore:
+			highScore = currentScore
+			bestGene = babies[babyCounter]
+
+	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+	print("The WINNER Of The Generation:", CalWeights(bestGene))
+	print("Highscore:", highScore)
+	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	time.sleep(3)
 	
 
 
