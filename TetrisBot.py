@@ -494,6 +494,7 @@ def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
 		print("next", nextBlock)
 		print("==============================================")
 		
+		time.sleep(0)
 		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
 			print("Game Over")
 			print("Final Score:", tetrisBoard_score)
@@ -501,7 +502,7 @@ def GetGeneScore(_holeWeight, _heightWeight, _scoreWeight):
 
 # 輸入基因，回傳每組基因的顯性數量(陣列)
 # 格式為[[], [], [], ...]
-def calWeights(geneArray):
+def CalWeights(geneArray):
 	weights = []
 	for group in range(len(geneArray)):
 		calWeightTemp = 0
@@ -509,10 +510,11 @@ def calWeights(geneArray):
 			calWeightTemp += geneArray[group][gene]
 		weights.append(calWeightTemp)
 	return weights
-	
-def MakeBabies(genes):
+
+# 輸入基因組，回傳一個充滿基因組的陣列(基因組生出的寶寶們)	
+def MakeBabies(genes, n):
 	trialingGenes = []
-	for geneCounter in range(100):
+	for geneCounter in range(n):
 		trialingGene = []
 		for groupCounter in range(len(genes)):
 			trialingGene.append(Fertilization(genes[groupCounter], genes[groupCounter]))
@@ -521,10 +523,20 @@ def MakeBabies(genes):
 # =====================主程式========================
 # 製作三個特徵基因組，格式為[holeGene, heightGene, scoreGene]
 # holeGene, heightGene, scoreGene都為012所組成的陣列
-bestGene = [Make_First_Gene(100), Make_First_Gene(100), Make_First_Gene(100)]
+motherGene = [Make_First_Gene(100), Make_First_Gene(100), Make_First_Gene(100)]
 
-print(len(MakeBabies(bestGene)))
-	
+highScore = 0
+bestGene = 0
+babies = MakeBabies(motherGene, 3)
+for baby in babies:
+	Weights = CalWeights(baby)
+	currentScore = GetGeneScore(Weights[0], Weights[1], Weights[2])
+	if currentScore > highScore:
+		highScore = currentScore
+		bestGene = baby
+
+print(CalWeights(bestGene))
+print("highscore", highScore)
 	
 
 
