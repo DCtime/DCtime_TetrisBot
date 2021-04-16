@@ -452,7 +452,7 @@ def TetrisQuestionMaker():
 # highScore這代最高分數是啥
 # bestWeights 這代最高分是誰
 # weights 現在玩遊戲的寶寶之權重
-def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None, weights=None):
+def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[], no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None, weights=None):
 	# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 	# "-"為空白, "*"為有東西
 	# 下面為示意圖
@@ -480,14 +480,21 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, no=None, genera
 	
 	for i in range(18):
 	    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
-	
+	    
 	# tetrisBoard的分數
 	tetrisBoard_score = 0
 	
+	
+	if len(trialQuestion) != maxMove:
+		print("Question's length must be equal to your maxMove.")
+		print("Auto generating a question...")
+		for blockCounter in range(maxMove):
+			trialQuestion.append(TetrisQuestionMaker())
+		
 	# 此掉落之俄羅斯方塊
-	currentBlock = TetrisQuestionMaker()
+	currentBlock = trialQuestion[0]
 	# 下一個俄羅斯方塊
-	nextBlock = TetrisQuestionMaker()
+	nextBlock = trialQuestion[1]
 	
 	time.sleep(0)
 	move = []
@@ -502,7 +509,7 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, no=None, genera
 		print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
 		
 		currentBlock = nextBlock
-		nextBlock = TetrisQuestionMaker()
+		nextBlock = trialQuestion[moveCounter]
 		print("current:", currentBlock)
 		print("next", nextBlock)
 		print("==============================================")
@@ -545,7 +552,7 @@ def MakeBabies(genes, n):
 # maxNo 一個子代生的數量
 # maxGeneration 要生幾個世代
 # AlleleQuantity 個體之每個特徵等為基因數量
-maxMove = 100
+maxMove = 5
 maxNo = 10
 maxGeneration = 5
 AlleleQuantity= 100
@@ -559,10 +566,15 @@ time.sleep(3)
 for generationCounter in range(maxGeneration):
 	highScore = 0
 	babies = MakeBabies(bestGene, maxNo)
+	
+	trialQuestion = []
+	for questionCounter in range(maxMove):
+		trialQuestion.append(TetrisQuestionMaker())
+		
 	for babyCounter in range(len(babies)):
 		weights = CalWeights(babies[babyCounter])
-		# (holeWeight, heightWeight, scoreWeight, maxMove, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None)
-		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights)
+		# (holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None)
+		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights)
 		if currentScore > highScore:
 			highScore = currentScore
 			bestGene = babies[babyCounter]
