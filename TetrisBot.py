@@ -535,7 +535,7 @@ def CalWeights(geneArray):
 	weights = []
 	for group in range(len(geneArray)):
 		calWeightTemp = 0
-		for gene in range(100):
+		for gene in range(len(geneArray[group])):
 			calWeightTemp += geneArray[group][gene]
 		weights.append(calWeightTemp)
 	return weights
@@ -554,16 +554,21 @@ def MakeBabies(genes, n):
 # maxNo 一個子代生的數量
 # maxGeneration 要生幾個世代
 # AlleleQuantity 個體之每個特徵等為基因數量
-maxMove = 30
-maxNo = 1
+maxMove = 100
+maxNo = 100
 maxGeneration = 5
-AlleleQuantity= 100
+alleleQuantity= 50
 
-bestGene = [Make_First_Gene(AlleleQuantity), Make_First_Gene(AlleleQuantity), Make_First_Gene(AlleleQuantity)]
-print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-print("Mother Gene:", CalWeights(bestGene))
-print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-time.sleep(3)
+print(">>>>>>>>>>>>>Training Settings<<<<<<<<<<<<")
+print("Max Moves :", maxMove)
+print("Babies per generation :", maxNo)
+print("Max Generations :", maxGeneration)
+print("Allele Quantity :", alleleQuantity)
+print(">>>>>>>>>>>>>>starts in 10 second<<<<<<<<<<<<<<<<")
+time.sleep(10)
+
+bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)]
+
 
 for generationCounter in range(maxGeneration):
 	highScore = 0
