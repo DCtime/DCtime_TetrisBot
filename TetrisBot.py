@@ -486,7 +486,7 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 	# tetrisBoard的分數
 	tetrisBoard_score = 0
 	
-	
+	# 如果題目是不合格的，長度不足或超過
 	if len(trialQuestion) != maxMove:
 		print("Question's length must be equal to your maxMove.")
 		print("Auto generating a question...")
@@ -499,17 +499,21 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 	nextBlock = trialQuestion[1]
 	
 	time.sleep(0)
+	# 儲存此版面最佳動作
 	move = []
 	for moveCounter in range(maxMove):
+		# 將算出的最佳動作存入move
 		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
+		# 執行最佳動作，並計算分數
 		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
+		# 印出此動作的相關訊息
 		print("==============================================")
 		print("Generation:", generation, "/", maxGeneration, "( Mother:", motherWeights, ")")
 		print("No.", no, "/", maxNo, "( Weights:", weights, ")")
 		print("Moves:", moveCounter + 1, "/", maxMove)
 		PrintBoard(tetrisBoard)
 		print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
-		
+		# 印出現在正在掉落(非實行動作的)，與下一個準備掉落的俄羅斯方塊
 		currentBlock = nextBlock
 		nextBlock = trialQuestion[moveCounter]
 		print("current:", currentBlock)
@@ -517,7 +521,9 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 		print("==============================================")
 		
 		time.sleep(0)
+		# 如果從上往下數第三個有東西了
 		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
+			# 提前結束，結算成績
 			print("Game Over")
 			print("Final Score:", tetrisBoard_score)
 			return tetrisBoard_score
@@ -526,6 +532,7 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 	print("]]]]]]]]]]] ", weights, " Final Score:", tetrisBoard_score, "[[[[[[[[[[[[")
 	print("==========================================================")
 		
+	# 印出此寶寶的最終成績，停兩秒
 	time.sleep(2)
 	return tetrisBoard_score
 
@@ -567,26 +574,36 @@ print("Allele Quantity :", alleleQuantity)
 print(">>>>>>>>>>>>>>starts in 10 second<<<<<<<<<<<<<<<<")
 time.sleep(10)
 
+# 將第一個準備要自交的寶寶產生出來
 bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)]
 
-
+# 在每個子代裡
 for generationCounter in range(maxGeneration):
+	# 把子帶最高分設為0
 	highScore = 0
+	# 開始自交生寶寶
 	babies = MakeBabies(bestGene, maxNo)
+	# 將生小孩的媽媽存起來，供版面顯示使用
 	mother = bestGene
 	
+	# 產生篩選寶寶的題目
 	trialQuestion = []
 	for questionCounter in range(maxMove):
 		trialQuestion.append(TetrisQuestionMaker())
-		
+	
+	# 把第一個小孩基因分析顯性數量
 	for babyCounter in range(len(babies)):
 		weights = CalWeights(babies[babyCounter])
 		# (holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None, motherWeights=None)
+		# 算出這個基因會在環境中得到幾分
 		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights, CalWeights(mother))
+		# 如果分數大於子代最高紀錄
 		if currentScore > highScore:
+			# 將最高分與最棒基因換成這個寶寶的分數與基因
 			highScore = currentScore
 			bestGene = babies[babyCounter]
-
+			
+			# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
 	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 	print("The WINNER Of The Generation:", CalWeights(bestGene))
