@@ -1,8 +1,6 @@
-# remember to download pyautogui moduel
-# or it will not work
-
 import random
 import time
+import multiprocessing
 
 # 製造行為方程式
 # 製作第一個基因組
@@ -23,20 +21,20 @@ def Make_First_Gene(alleleQuantity):
 # 兩個輸入須為list格式，記得兩者長度必須相同，而且兩者都是由0, 1, 2構成
 # 每一個數字都是基因組的等為基因，0為隱性(aa)，1為半顯性(Aa)，2為顯性(AA)
 def Fertilization(firstListOfGene, secondListOfGene):
-    answerGene = []
+    answerGene = [] # 儲存回傳的答案基因
     
-    if (len(firstListOfGene) != len(secondListOfGene)):
-        print("Two lists of genes must be the same length")
-        return null
+    if (len(firstListOfGene) != len(secondListOfGene)): # 當兩個基因長度不同的時候
+        print("Two lists of genes must be the same length") # 印出警語
+        return null # 結束程式
 
-    firstProcessingGene = firstListOfGene
+    firstProcessingGene = firstListOfGene # 將輸入的值個別存入frirstProcessOfGene 和 SecondProcessOfGene
     secondProcessingGene = secondListOfGene
 
-    firstProcessingGene = Meiosis(firstProcessingGene)
+    firstProcessingGene = Meiosis(firstProcessingGene) # 減數分裂
     secondProcessingGene = Meiosis(secondProcessingGene)
     
     for i in range(len(firstProcessingGene)):
-        answerGene.append(firstProcessingGene[i] + secondProcessingGene[i])
+        answerGene.append(firstProcessingGene[i] + secondProcessingGene[i]) # 受精
 
     return answerGene
 
@@ -44,12 +42,12 @@ def Fertilization(firstListOfGene, secondListOfGene):
 # 輸入須為list格式，記得兩者長度必須相同，而且兩者都是由0, 1, 2構成
 # 每一個數字都是基因組的等為基因，0為隱性(aa)，1為半顯性(Aa)，2為顯性(AA)
 def Meiosis(listOfGene):
-    answerGene = []
-    processingGene = listOfGene
-    length = len(processingGene)
+    answerGene = [] # 儲存答案
+    processingGene = listOfGene # 將樹入的基因存入processingGene
+    length = len(processingGene) # 存基因的長度
 
     for i in processingGene:
-        answerGene.append(Meiosis_Allele(i))
+        answerGene.append(Meiosis_Allele(i)) # 每一組等位基因做減數分裂
 
     return answerGene
 
@@ -58,20 +56,20 @@ def Meiosis(listOfGene):
 # 0為隱性(aa)，1為半顯性(Aa)，2為顯性(AA)
 def Meiosis_Allele(gene):
     
-    randomNum = random.random()
+    randomNum = random.random() # 得到一個0~1的數字，存入randomNum
     #print(randomNum)
     
-    if (gene == 0):
-        return 0
-    elif (gene == 1):
-        if (randomNum < 0.5):
+    if (gene == 0): # 如果等位基因為隱性
+        return 0 # 減數分裂後必為隱性
+    elif (gene == 1): # 如果等位基因為半顯性
+        if (randomNum < 0.5): # 小於0.5為隱性
             return 0
         else:
-            return 1
-    elif (gene == 2):
+            return 1 # 大於等於0.5為顯性
+    elif (gene == 2): # 如果等位基因為顯性
         return 1
     else:
-        print("Error, gene must be 0, 1 or 2")
+        print("Error, gene must be 0, 1 or 2") # 如果格式不符，回傳錯誤訊息
 
 # 下一步製作俄羅斯方塊模擬器
 # --------------------關於俄羅斯方塊的函數----------------------------
@@ -207,27 +205,21 @@ def Place_TetrisBlock(type, rotation, location, board):
 	else:
 		print("Type not found. Available type: L, J, S, Z, T, I, O ")
 	
-	# 找停下來的位置
-	stop = False
-	while 1:
-		# 檢查每一個方塊
+	stop = False # 找停下來的位置
+	while 1: # 檢查每一個方塊
 		for i in checkBlock:
-			# 如果以碰到地板，stop = true
-			if i[0] + 1 > 17:
+			if i[0] + 1 > 17: # 如果以碰到地板，stop = true
 				# print("STOP")
 				stop = True
 				break
-			# 每一個方塊下面是不是有東西，如果有，stop = true
-			elif board[i[0] + 1][i[1]] == "*":
+			elif board[i[0] + 1][i[1]] == "*": # 每一個方塊下面是不是有東西，如果有，stop = true
 				# print("STOP")
 				stop = True
 				break
-		# 如果stop == false，全部方塊下去一階
-		if stop == False:
+		if stop == False: # 如果stop == false，全部方塊下去一階
 			for i in checkBlock:
 				i[0] = i[0] + 1
-		# 如果stop == true，將"-"換成"*"(board)，並跳出迴圈
-		else:
+		else: # 如果stop == true，將"-"換成"*"(board)，並跳出迴圈
 			for i in checkBlock:
 				board[i[0]][i[1]] = "*"
 				# print("i[0]", i[0])
@@ -240,16 +232,13 @@ def Place_TetrisBlock(type, rotation, location, board):
 # 檢查版面函數(消行與計分)(被TetrisMovement使用)
 # 會回傳此檢查所獲得的分數，並完成設定板上的消除
 def CheckBoard(board):
-	# 紀錄消掉的行的編號
-	cleaned = []
-	# 在每一行中
-	for i in range(18):
+	cleaned = [] # 紀錄消掉的行的編號
+
+	for i in range(18): # 在每一行中
 		for j in range(10):
-			# 如果有一個空的，不理
-			if board[i][j] == "-":
+			if board[i][j] == "-": # 如果有一個空的，不理
 				break
-		# 如果都是"*",清掉那一行並標記起來
-		else:
+		else: # 如果都是"*",清掉那一行並標記起來
 			board[i] = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 			cleaned.append(i)
 	# print(cleaned)
@@ -296,8 +285,7 @@ def CheckBoard(board):
 # 洞洞計數器(被TetrisMovement使用)
 # 輸入欲搜尋之版面，回傳製造之洞洞數量
 def Holes_Quantity(board):
-	# 存放洞洞數量
-	holes = 0
+	holes = 0 # 存放洞洞數量
 	for x in range(10):
 		#print("checking x:", x)
 		for y in range(18):
@@ -357,35 +345,21 @@ def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
 		testBoard.append(xtemp)
 		xtemp = []
 			
-	# 儲存此動作回傳的數值
-	tetrisMovementTemp = []
-	# 分數變化量
-	delta_score = 0
-	# 放置前洞的數量
-	previous_holes = Holes_Quantity(testBoard)
-	# 放置後洞的變化
-	delta_holes = 0
-	# 放置方塊的最大高度
-	height = 0
+	tetrisMovementTemp = [] # 儲存此動作回傳的數值
+	delta_score = 0 # 分數變化量
+	previous_holes = Holes_Quantity(testBoard) # 放置前洞的數量
+	delta_holes = 0 # 放置後洞的變化
+	height = 0 # 放置方塊的最大高度
 
-	# 放置方塊，並把回傳的東西放到tetrisMovementTemp
-	tetrisMovementTemp = Tetris_Movement(block1[0], block1[1], block1[2], testBoard)
-	# 計算分數變化量
-	delta_score += tetrisMovementTemp[0]
-	# 計算產生的洞洞數
-	delta_holes += tetrisMovementTemp[1] - previous_holes
-	# 高度存入height
-	height += tetrisMovementTemp[2]
+	tetrisMovementTemp = Tetris_Movement(block1[0], block1[1], block1[2], testBoard) # 放置方塊，並把回傳的東西放到tetrisMovementTemp
+	delta_score += tetrisMovementTemp[0] # 計算分數變化量
+	delta_holes += tetrisMovementTemp[1] - previous_holes # 計算產生的洞洞數
+	height += tetrisMovementTemp[2] # 高度存入height
 	
-	# 放置方塊，並把回傳的東西放到tetrisMovementTemp
-	tetrisMovementTemp = Tetris_Movement(block2[0], block2[1], block2[2], testBoard)
-	# 計算分數變化量
-	delta_score += tetrisMovementTemp[0]
-	# 計算產生的洞洞數
-	delta_holes += tetrisMovementTemp[1] - previous_holes
-	# 高度存入height
-	height += tetrisMovementTemp[2]
-	
+	tetrisMovementTemp = Tetris_Movement(block2[0], block2[1], block2[2], testBoard) # 放置方塊，並把回傳的東西放到tetrisMovementTemp
+	delta_score += tetrisMovementTemp[0] # 計算分數變化量
+	delta_holes += tetrisMovementTemp[1] - previous_holes # 計算產生的洞洞數
+	height += tetrisMovementTemp[2] # 高度存入height
 	
 	return delta_holes * holeWeight + height * heightWeight + -1 * delta_score // 20 * scoreWeight
 	
@@ -410,10 +384,9 @@ def FindBestMove(board, fBlock, sBlock, holeWeight, heightWeight, scoreWeight):
 					# 此動作糟糕分數與全部最佳分數(最低)
 					# print("tempBadScore:", tempBadScore)
 					# print("lowestBadScore:", lowestBadScore)
-					# 如果現分數是全部最佳分數
-					if tempBadScore < lowestBadScore:
-						lowestBadScore = tempBadScore
-						# 把這個步驟儲存起來
+					
+					if tempBadScore < lowestBadScore: # 如果現分數是全部最佳分數
+						lowestBadScore = tempBadScore # 把這個步驟儲存起來
 						bestMove = [fBlock, r1, x1]
 	# 印出此動作最佳成績
 	# print("lowestBadScore:", lowestBadScore)		
@@ -483,29 +456,23 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 	for i in range(18):
 	    tetrisBoard.append(["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"])
 	    
-	# tetrisBoard的分數
-	tetrisBoard_score = 0
+	tetrisBoard_score = 0 # tetrisBoard的分數
 	
-	# 如果題目是不合格的，長度不足或超過
-	if len(trialQuestion) != maxMove:
+	if len(trialQuestion) != maxMove: # 如果題目是不合格的，長度不足或超過
 		print("Question's length must be equal to your maxMove.")
 		print("Auto generating a question...")
 		for blockCounter in range(maxMove):
 			trialQuestion.append(TetrisQuestionMaker())
 		
-	# 此掉落之俄羅斯方塊
-	currentBlock = trialQuestion[0]
-	# 下一個俄羅斯方塊
-	nextBlock = trialQuestion[1]
+	currentBlock = trialQuestion[0] # 此掉落之俄羅斯方塊
+	nextBlock = trialQuestion[1] # 下一個俄羅斯方塊
 	
 	time.sleep(0)
-	# 儲存此版面最佳動作
-	move = []
+
+	move = [] # 儲存此版面最佳動作
 	for moveCounter in range(maxMove):
-		# 將算出的最佳動作存入move
-		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight)
-		# 執行最佳動作，並計算分數
-		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0]
+		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight) # 將算出的最佳動作存入move
+		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0] # 執行最佳動作，並計算分數
 		# 印出此動作的相關訊息
 		print("==============================================")
 		print("Generation:", generation, "/", maxGeneration, "( Mother:", motherWeights, ")")
@@ -521,8 +488,7 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 		print("==============================================")
 		
 		time.sleep(0)
-		# 如果從上往下數第三個有東西了
-		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:
+		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]: # 如果從上往下數第三個有東西了
 			# 提前結束，結算成績
 			print("Game Over")
 			print("Final Score:", tetrisBoard_score)
@@ -574,17 +540,12 @@ print("Allele Quantity :", alleleQuantity)
 print(">>>>>>>>>>>>>>starts in 10 second<<<<<<<<<<<<<<<<")
 time.sleep(10)
 
-# 將第一個準備要自交的寶寶產生出來
-bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)]
+bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)] # 將第一個準備要自交的寶寶產生出來
 
-# 在每個子代裡
-for generationCounter in range(maxGeneration):
-	# 把子帶最高分設為0
-	highScore = 0
-	# 開始自交生寶寶
-	babies = MakeBabies(bestGene, maxNo)
-	# 將生小孩的媽媽存起來，供版面顯示使用
-	mother = bestGene
+for generationCounter in range(maxGeneration): # 在每個子代裡
+	highScore = 0 # 把子帶最高分設為0
+	babies = MakeBabies(bestGene, maxNo) # 開始自交生寶寶
+	mother = bestGene # 將生小孩的媽媽存起來，供版面顯示使用
 	
 	# 產生篩選寶寶的題目
 	trialQuestion = []
@@ -597,13 +558,13 @@ for generationCounter in range(maxGeneration):
 		# (holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None, motherWeights=None)
 		# 算出這個基因會在環境中得到幾分
 		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights, CalWeights(mother))
-		# 如果分數大於子代最高紀錄
-		if currentScore > highScore:
+		
+		if currentScore > highScore: # 如果分數大於子代最高紀錄
 			# 將最高分與最棒基因換成這個寶寶的分數與基因
 			highScore = currentScore
 			bestGene = babies[babyCounter]
 			
-			# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
+	# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
 	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 	print("The WINNER Of The Generation:", CalWeights(bestGene))
