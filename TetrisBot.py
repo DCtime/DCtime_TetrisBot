@@ -1,6 +1,7 @@
 import random
 import time
-import multiprocessing
+from multiprocessing import Process, Pool
+import os, time
 
 # 製造行為方程式
 # 製作第一個基因組
@@ -474,18 +475,18 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 		move = FindBestMove(tetrisBoard, currentBlock, nextBlock, holeWeight,heightWeight, scoreWeight) # 將算出的最佳動作存入move
 		tetrisBoard_score += Tetris_Movement(move[0], move[1], move[2], tetrisBoard)[0] # 執行最佳動作，並計算分數
 		# 印出此動作的相關訊息
-		print("==============================================")
-		print("Generation:", generation, "/", maxGeneration, "( Mother:", motherWeights, ")")
-		print("No.", no, "/", maxNo, "( Weights:", weights, ")")
+		#print("==============================================")
+		# print("Generation:", generation, "/", maxGeneration, "( Mother:", motherWeights, ")")
+		# print("No.", no, "/", maxNo, "( Weights:", weights, ")")
 		print("Moves:", moveCounter + 1, "/", maxMove)
-		PrintBoard(tetrisBoard)
-		print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
+		# PrintBoard(tetrisBoard)
+		# print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
 		# 印出現在正在掉落(非實行動作的)，與下一個準備掉落的俄羅斯方塊
 		currentBlock = nextBlock
 		nextBlock = trialQuestion[moveCounter]
-		print("current:", currentBlock)
-		print("next", nextBlock)
-		print("==============================================")
+		#print("current:", currentBlock)
+		#print("next", nextBlock)
+		#print("==============================================")
 		
 		time.sleep(0)
 		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]: # 如果從上往下數第三個有東西了
@@ -498,8 +499,8 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 	print("]]]]]]]]]]] ", weights, " Final Score:", tetrisBoard_score, "[[[[[[[[[[[[")
 	print("==========================================================")
 		
-	# 印出此寶寶的最終成績，停兩秒
-	time.sleep(2)
+	# 印出此寶寶的最終成績，停X秒
+	time.sleep(0)
 	return tetrisBoard_score
 
 # 輸入基因，回傳每組基因的顯性數量(陣列)
@@ -523,55 +524,67 @@ def MakeBabies(genes, n):
 		trialingGenes.append(trialingGene)
 	return trialingGenes
 # =====================主程式========================
-# maxMove 一個遊戲結算之步數
-# maxNo 一個子代生的數量
-# maxGeneration 要生幾個世代
-# AlleleQuantity 個體之每個特徵等為基因數量
-maxMove = 100
-maxNo = 100
-maxGeneration = 5
-alleleQuantity= 50
+def GetBabyScore(babyGene, maxMove, trialQuestion):
+	weights = CalWeights(babyGene)
+	currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion)
+	return currentScore
 
-print(">>>>>>>>>>>>>Training Settings<<<<<<<<<<<<")
-print("Max Moves :", maxMove)
-print("Babies per generation :", maxNo)
-print("Max Generations :", maxGeneration)
-print("Allele Quantity :", alleleQuantity)
-print(">>>>>>>>>>>>>>starts in 10 second<<<<<<<<<<<<<<<<")
-time.sleep(10)
+def GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion):
+	pool = Pool()
+	inputs = []
+	for baby in babies:
+		inputs.append((baby, maxMove, trialQuestion))
+	pool_outputs = pool.starmap(GetBabyScore, inputs)
+	return pool_outputs
 
-bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)] # 將第一個準備要自交的寶寶產生出來
+if __name__ == '__main__':
+	# maxMove 一個遊戲結算之步數
+	# maxNo 一個子代生的數量
+	# maxGeneration 要生幾個世代
+	# AlleleQuantity 個體之每個特徵等為基因數量
+	maxMove = 100
+	maxNo = 100
+	maxGeneration = 5
+	alleleQuantity = 50
 
-for generationCounter in range(maxGeneration): # 在每個子代裡
-	highScore = 0 # 把子帶最高分設為0
-	babies = MakeBabies(bestGene, maxNo) # 開始自交生寶寶
-	mother = bestGene # 將生小孩的媽媽存起來，供版面顯示使用
-	
-	# 產生篩選寶寶的題目
-	trialQuestion = []
-	for questionCounter in range(maxMove):
-		trialQuestion.append(TetrisQuestionMaker())
-	
-	# 把第一個小孩基因分析顯性數量
-	for babyCounter in range(len(babies)):
-		weights = CalWeights(babies[babyCounter])
-		# (holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion, no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None,  weights=None, motherWeights=None)
-		# 算出這個基因會在環境中得到幾分
-		currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion, babyCounter + 1, generationCounter + 1, len(babies), maxGeneration, highScore, CalWeights(bestGene), weights, CalWeights(mother))
-		
-		if currentScore > highScore: # 如果分數大於子代最高紀錄
-			# 將最高分與最棒基因換成這個寶寶的分數與基因
-			highScore = currentScore
-			bestGene = babies[babyCounter]
-			
-	# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
-	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-	print("The WINNER Of The Generation:", CalWeights(bestGene))
-	print("Highscore:", highScore)
-	print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-	print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	print(">>>>>>>>>>>>>Training Settings<<<<<<<<<<<<")
+	print("Max Moves :", maxMove)
+	print("Babies per generation :", maxNo)
+	print("Max Generations :", maxGeneration)
+	print("Allele Quantity :", alleleQuantity)
+	print(">>>>>>>>>>>>>>starts in 3 second<<<<<<<<<<<<<<<<")
 	time.sleep(3)
+
+	bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)] # 將第一個準備要自交的寶寶產生出來
+
+	for generationCounter in range(maxGeneration): # 在每個子代裡
+		highScore = 0 # 把子帶最高分設為0
+		babies = MakeBabies(bestGene, maxNo) # 開始自交生寶寶
+		mother = bestGene # 將生小孩的媽媽存起來，供版面顯示使用
+
+		# 產生篩選寶寶的題目
+		trialQuestion = []
+		for questionCounter in range(maxMove):
+			trialQuestion.append(TetrisQuestionMaker())
+
+		# 把第一個小孩基因分析顯性數量
+		print(GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion))
+
+		'''if currentScore > highScore: # 如果分數大於子代最高紀錄
+				# 將最高分與最棒基因換成這個寶寶的分數與基因
+				highScore = currentScore
+				bestGene = babies[babyCounter]
+				
+		# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		print("The WINNER Of The Generation:", CalWeights(bestGene))
+		print("Highscore:", highScore)
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		time.sleep(3)'''
+
+	_ = input("press any key to continue...")
 	
 
 
