@@ -428,7 +428,7 @@ def TetrisQuestionMaker():
 # bestWeights 這代最高分是誰
 # weights 現在玩遊戲的寶寶之權重
 # motherWeights 這世代的製造者
-def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[], no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None, weights=None, motherWeights=None):
+def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[], no=None, generation=None, maxNo=None, maxGeneration=None, highScore=None, bestWeights=None, weights=None, motherWeights=None, showProcess=True):
 	# 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 	# "-"為空白, "*"為有東西
 	# 下面為示意圖
@@ -586,6 +586,33 @@ if __name__ == '__main__':
 
 	_ = input("press any key to continue...")
 	
+
+	bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)] # 將第一個準備要自交的寶寶產生出來
+
+	for generationCounter in range(maxGeneration): # 在每個子代裡
+		highScore = 0 # 把子帶最高分設為0
+		babies = MakeBabies(bestGene, maxNo) # 開始自交生寶寶
+		mother = bestGene # 將生小孩的媽媽存起來，供版面顯示使用
+		
+		# 產生篩選寶寶的題目
+		trialQuestion = []
+		for questionCounter in range(maxMove):
+			trialQuestion.append(TetrisQuestionMaker())
+		
+		MultiProcessGetBabiesScore(babies)
+
+		# 把第一個小孩基因分析顯性數量
+		
+		'''
+		# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		print("The WINNER Of The Generation:", CalWeights(bestGene))
+		print("Highscore:", highScore)
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		time.sleep(3)
+		'''
 
 
 
