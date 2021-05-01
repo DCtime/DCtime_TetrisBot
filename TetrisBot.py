@@ -478,7 +478,7 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 		#print("==============================================")
 		# print("Generation:", generation, "/", maxGeneration, "( Mother:", motherWeights, ")")
 		# print("No.", no, "/", maxNo, "( Weights:", weights, ")")
-		print("Moves:", moveCounter + 1, "/", maxMove)
+		# print("Moves:", moveCounter + 1, "/", maxMove)
 		# PrintBoard(tetrisBoard)
 		# print("Score:", tetrisBoard_score, "( HighScore:", highScore, ", Weights : ", bestWeights, ")")
 		# 印出現在正在掉落(非實行動作的)，與下一個準備掉落的俄羅斯方塊
@@ -491,13 +491,12 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
 		time.sleep(0)
 		if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]: # 如果從上往下數第三個有東西了
 			# 提前結束，結算成績
-			print("Game Over")
-			print("Final Score:", tetrisBoard_score)
+			print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score)
 			return tetrisBoard_score
 	
-	print("==========================================================")
-	print("]]]]]]]]]]] ", weights, " Final Score:", tetrisBoard_score, "[[[[[[[[[[[[")
-	print("==========================================================")
+	# print("==========================================================")
+	print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score)
+	# print("==========================================================")
 		
 	# 印出此寶寶的最終成績，停X秒
 	time.sleep(0)
@@ -530,7 +529,7 @@ def GetBabyScore(babyGene, maxMove, trialQuestion):
 	return currentScore
 
 def GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion):
-	pool = Pool()
+	pool = Pool(4)
 	inputs = []
 	for baby in babies:
 		inputs.append((baby, maxMove, trialQuestion))
@@ -543,8 +542,8 @@ if __name__ == '__main__':
 	# maxGeneration 要生幾個世代
 	# AlleleQuantity 個體之每個特徵等為基因數量
 	maxMove = 100
-	maxNo = 100
-	maxGeneration = 5
+	maxNo = 10
+	maxGeneration = 30
 	alleleQuantity = 50
 
 	print(">>>>>>>>>>>>>Training Settings<<<<<<<<<<<<")
@@ -568,59 +567,17 @@ if __name__ == '__main__':
 			trialQuestion.append(TetrisQuestionMaker())
 
 		# 把第一個小孩基因分析顯性數量
-		print(GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion))
+		babiesScore = GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion)
 
-		'''if currentScore > highScore: # 如果分數大於子代最高紀錄
-				# 將最高分與最棒基因換成這個寶寶的分數與基因
-				highScore = currentScore
-				bestGene = babies[babyCounter]
-				
-		# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-		print("The WINNER Of The Generation:", CalWeights(bestGene))
-		print("Highscore:", highScore)
-		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-		time.sleep(3)'''
+		for babyScoreCounter in range(len(babiesScore)):
+			if babiesScore[babyScoreCounter] > highScore:
+				highScore = babiesScore[babyScoreCounter]
+				bestGene = babies[babyScoreCounter]
+
+		print("Generation:", generationCounter + 1, "Best Gene:", CalWeights(bestGene), "Score:", highScore)
 
 	_ = input("press any key to continue...")
 	
-
-	bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity)] # 將第一個準備要自交的寶寶產生出來
-
-	for generationCounter in range(maxGeneration): # 在每個子代裡
-		highScore = 0 # 把子帶最高分設為0
-		babies = MakeBabies(bestGene, maxNo) # 開始自交生寶寶
-		mother = bestGene # 將生小孩的媽媽存起來，供版面顯示使用
-		
-		# 產生篩選寶寶的題目
-		trialQuestion = []
-		for questionCounter in range(maxMove):
-			trialQuestion.append(TetrisQuestionMaker())
-		
-		MultiProcessGetBabiesScore(babies)
-
-		# 把第一個小孩基因分析顯性數量
-		
-		'''
-		# 每在子代競爭結束後，印出最佳基因與分數。停止三秒
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-		print("The WINNER Of The Generation:", CalWeights(bestGene))
-		print("Highscore:", highScore)
-		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-		time.sleep(3)
-		'''
-
-
-
-
-
-
-
-
 
 
 
