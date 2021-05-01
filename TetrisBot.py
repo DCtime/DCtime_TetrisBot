@@ -15,8 +15,10 @@ import os, time
 # ------------------------關於基因的函數-----------------------------------
 # 製作第一個基因組，全部都是一(自交後會有各種可能，機率為常態分佈)
 # 輸入格式為int, 決定基因組之等為基因數量
-def Make_First_Gene(alleleQuantity):
-    answer = [1] * alleleQuantity
+def Make_Random_Gene(alleleQuantity):
+    answer = []
+    for _ in range(alleleQuantity):
+        answer.append(random.randint(0, 2))
     return answer
 
 
@@ -530,15 +532,19 @@ def CalWeights(geneArray):
     return weights
 
 
-# 輸入基因組，回傳一個充滿基因組的陣列(基因組生出的寶寶們)
-def MakeBabies(genes, n):
+# 輸入許多優秀的基因組，回傳一個充滿基因組(數量n)的陣列(基因組生出的寶寶們)
+def MakeBabies(bestBabies: list, n: int):
     trialingGenes = []  # 存生出來的寶寶們
+    babyA = []  # 存欲交配的基因A
+    babyB = []  # 存欲交配的基因B
     # 做n個個體
     for geneCounter in range(n):
         trialingGene = []  # 個別寶寶生成器
+        babyA = bestBabies[random.randint(0, len(bestBabies) - 1)]
+        babyB = bestBabies[random.randint(0, len(bestBabies) - 1)]
         # 在每一組表現特徵的基因組們裡
-        for groupCounter in range(len(genes)):
-            trialingGene.append(Fertilization(genes[groupCounter], genes[groupCounter]))  # 自交
+        for groupCounter in range(len(babyA)):
+            trialingGene.append(Fertilization(babyA[groupCounter], babyB[groupCounter]))  # 自交
         trialingGenes.append(trialingGene)  # 將自交產生的個體加入trialingGenes裡
     return trialingGenes
 
@@ -565,39 +571,79 @@ if __name__ == '__main__':
     # maxGeneration 要生幾個世代
     # AlleleQuantity 個體之每個特徵等為基因數量
     maxMove = 100
-    maxNo = 10
+    maxNo = 8
     maxGeneration = 30
     alleleQuantity = 50
+    bestBabiesQuantity = 3
+    bestBabies = []
+
+    # 如果bestBabiesQuantity大於maxNo，將bestBabiesQuantity設為maxNo
+    if bestBabiesQuantity > maxNo:
+        print("bestBabiesQuantity must bes smaller than maxNo")
+        print("auto set bestBabiesQuantity to maxNo")
+        bestBabiesQuantity = maxNo
 
     print(">>>>>>>>>>>>>Training Settings<<<<<<<<<<<<")
     print("Max Moves :", maxMove)
     print("Babies per generation :", maxNo)
     print("Max Generations :", maxGeneration)
     print("Allele Quantity :", alleleQuantity)
+    print("bestBabiesQuantity :", bestBabiesQuantity)
     print(">>>>>>>>>>>>>>starts in 3 second<<<<<<<<<<<<<<<<")
     time.sleep(3)
 
-    bestGene = [Make_First_Gene(alleleQuantity), Make_First_Gene(alleleQuantity),
-                Make_First_Gene(alleleQuantity)]  # 將第一個準備要自交的寶寶產生出來
+    for _ in range(bestBabiesQuantity):
+        bestBabies.append([Make_Random_Gene(alleleQuantity),
+                          Make_Random_Gene(alleleQuantity),
+                          Make_Random_Gene(alleleQuantity)])  # 將第一個準備要自交的寶寶產生出來
+
+    print("Initialize babies:", end="")
+    for baby in bestBabies:
+        print(CalWeights(baby), end="")
+    print()
 
     for generationCounter in range(maxGeneration):  # 在每個子代裡
         highScore = 0  # 把子帶最高分設為0
-        babies = MakeBabies(bestGene, maxNo)  # 開始自交生寶寶
-        mother = bestGene  # 將生小孩的媽媽存起來，供版面顯示使用
+        babies = MakeBabies(bestBabies, maxNo)  # 開始自交生寶寶
+
+        print("Generation", generationCounter + 1, "babies:", end="")
+        for baby in babies:
+            print(CalWeights(baby), end="")
+        print()
 
         # 產生篩選寶寶的題目
         trialQuestion = []
         for questionCounter in range(maxMove):
             trialQuestion.append(TetrisQuestionMaker())
 
-        # 把第一個小孩基因分析顯性數量
+        # 把所有小孩的分數算出來，照著babies的順序
         babiesScore = GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion)
 
-        for babyScoreCounter in range(len(babiesScore)):
-            if babiesScore[babyScoreCounter] > highScore:
-                highScore = babiesScore[babyScoreCounter]
-                bestGene = babies[babyScoreCounter]
+        # 找到分數前bestBabiesQuantity名的寶寶，存入bestBabies
+        bestBabiesIndex = []  # 存現在前幾名的索引值(bestBabies & babiesScore都通用)
+        for babiesCurrentProcessIndex in range(maxNo):
+            if len(bestBabiesIndex) < bestBabiesQuantity:
+                bestBabiesIndex.append(babiesCurrentProcessIndex)
+            else:
+                smallestBestBabiesScoreIndex = None
+                for babiesComparingIndex in bestBabiesIndex:
+                    if smallestBestBabiesScoreIndex == None:
+                        smallestBestBabiesScoreIndex = babiesComparingIndex
+                    else:
+                        if babiesScore[smallestBestBabiesScoreIndex] > babiesScore[babiesComparingIndex]:
+                            smallestBestBabiesScoreIndex = babiesComparingIndex
+                if babiesScore[babiesCurrentProcessIndex] > babiesScore[smallestBestBabiesScoreIndex]:
+                    bestBabiesIndex.remove(smallestBestBabiesScoreIndex)
+                    bestBabiesIndex.append(babiesCurrentProcessIndex)
 
-        print("Generation:", generationCounter + 1, "Best Gene:", CalWeights(bestGene), "Score:", highScore)
+        bestBabiesTemp = []
+        for index in bestBabiesIndex:
+            bestBabiesTemp.append(babies[index])
+
+        print("Generation:", generationCounter + 1)
+        for index in bestBabiesIndex:
+            print("Best babies", CalWeights(babies[index]), ", score:", babiesScore[index])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        bestBabies = bestBabiesTemp
 
     _ = input("press any key to continue...")
