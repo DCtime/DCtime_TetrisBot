@@ -1,7 +1,8 @@
 import random
 import time
 from multiprocessing import Process, Pool
-import os, time
+import os
+import multiprocessing
 
 
 # 製造行為方程式
@@ -15,12 +16,18 @@ import os, time
 # ------------------------關於基因的函數-----------------------------------
 # 製作第一個基因組，全部都是一(自交後會有各種可能，機率為常態分佈)
 # 輸入格式為int, 決定基因組之等為基因數量
-def Make_Random_Gene(alleleQuantity):
-    answer = []
-    for _ in range(alleleQuantity):
-        answer.append(random.randint(0, 2))
-    return answer
-
+def Make_First_Genes(alleleQuantity, geneGroupQuantity, babyQuantity):
+    if geneGroupQuantity == 1 or geneGroupQuantity == 2:
+        return [[[[1] * alleleQuantity] * geneGroupQuantity] * babyQuantity]
+    else:
+        answer = []
+        poleGeneQuantity = geneGroupQuantity // 3
+        for _ in range(poleGeneQuantity):
+            answer.append([[0] * alleleQuantity] * geneGroupQuantity)
+            answer.append([[2] * alleleQuantity] * geneGroupQuantity)
+        for _ in range(babyQuantity - poleGeneQuantity * 2):
+            answer.append([[1] * alleleQuantity] * geneGroupQuantity)
+        return answer
 
 # 將兩組2n基因組交配，回傳孩子的基因組
 # 兩個輸入須為list格式，記得兩者長度必須相同，而且兩者都是由0, 1, 2構成
@@ -508,11 +515,11 @@ def GetGeneScore(holeWeight, heightWeight, scoreWeight, maxMove, trialQuestion=[
         time.sleep(0)
         if tetrisBoard[2] != ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]:  # 如果從上往下數第三個有東西了
             # 提前結束，結算成績
-            print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score)
+            print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score, end="")
             return tetrisBoard_score
 
     # print("==========================================================")
-    print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score)
+    print([holeWeight, heightWeight, scoreWeight], " Final Score:", tetrisBoard_score, end="")
     # print("==========================================================")
 
     # 印出此寶寶的最終成績，停X秒
@@ -550,17 +557,21 @@ def MakeBabies(bestBabies: list, n: int):
 
 
 # =====================主程式========================
-def GetBabyScore(babyGene, maxMove, trialQuestion):
+def GetBabyScore(babyGene, maxMove, trialQuestion, currentProcess):
     weights = CalWeights(babyGene)
     currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion)
+    currentProcess.value += 1
+    print(" [currentProcess:", currentProcess.value, "]")
     return currentScore
 
 
 def GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion):
     pool = Pool(4)
     inputs = []
+    manager = multiprocessing.Manager()
+    currentProcess = manager.Value('i', 0)
     for baby in babies:
-        inputs.append((baby, maxMove, trialQuestion))
+        inputs.append((baby, maxMove, trialQuestion, currentProcess))
     pool_outputs = pool.starmap(GetBabyScore, inputs)
     return pool_outputs
 
@@ -571,9 +582,9 @@ if __name__ == '__main__':
     # maxGeneration 要生幾個世代
     # AlleleQuantity 個體之每個特徵等為基因數量
     maxMove = 100
-    maxNo = 8
-    maxGeneration = 30
-    alleleQuantity = 50
+    maxNo = 10
+    maxGeneration = 5
+    alleleQuantity = 5
     bestBabiesQuantity = 3
     bestBabies = []
 
@@ -592,10 +603,7 @@ if __name__ == '__main__':
     print(">>>>>>>>>>>>>>starts in 3 second<<<<<<<<<<<<<<<<")
     time.sleep(3)
 
-    for _ in range(bestBabiesQuantity):
-        bestBabies.append([Make_Random_Gene(alleleQuantity),
-                          Make_Random_Gene(alleleQuantity),
-                          Make_Random_Gene(alleleQuantity)])  # 將第一個準備要自交的寶寶產生出來
+    bestBabies = Make_First_Genes(alleleQuantity, 3, bestBabiesQuantity)  # 將準備要交配的寶寶產生出來
 
     print("Initialize babies:", end="")
     for baby in bestBabies:
