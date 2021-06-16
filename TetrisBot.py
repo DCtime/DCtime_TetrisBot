@@ -1,10 +1,45 @@
+# imports
 import random
 import time
 from multiprocessing import Process, Pool
 import os
 import multiprocessing
 
+# 基因產生器
+# 根據全部基因組數量與遇顯性的數量，製造出一個基因(以0,1,2組成的整數陣列)
+def Gene_Generator(alleleQuantity, dominant_gene_value):
+    # dominant_gene_value // 2, 最多可以有的全顯性(2)數量
+    must_two = dominant_gene_value - alleleQuantity
+    while 1:
+        twos = dominant_gene_value // 2 - random.randint(0, dominant_gene_value // 2)
+        if twos >= must_two:
+            break
 
+    ones = dominant_gene_value % 2 + (dominant_gene_value // 2 - twos) * 2
+    # print("twos:" , twos)
+    # print("ones:", ones)
+    gene = [0] * alleleQuantity
+
+
+    # twos 為二的數量
+    for _ in range(twos):
+        while 1:
+            random_index = random.randint(0, alleleQuantity - 1)
+            if gene[random_index] == 0:
+                gene[random_index] = 2
+                # print("index:", random_index, "add: 2", gene)
+                break
+
+    # ones 為一的數量
+    for _ in range(ones):
+        while 1:
+            random_index = random.randint(0, alleleQuantity - 1)
+            if gene[random_index] == 0:
+                gene[random_index] = 1
+                # print("index:", random_index, "add: 1", gene)
+                break
+    
+    return gene
 # 製造行為方程式
 # 製作第一個基因組
 # 自交，生出一百個小孩
@@ -16,18 +51,18 @@ import multiprocessing
 # ------------------------關於基因的函數-----------------------------------
 # 製作第一個基因組，全部都是一(自交後會有各種可能，機率為常態分佈)
 # 輸入格式為int, 決定基因組之等為基因數量
+# alleleQuantity 基因組長度
+# geneGroupQuantity 寶寶性徵數量
+# babyQuantity 寶寶數量
 def Make_First_Genes(alleleQuantity, geneGroupQuantity, babyQuantity):
-    if geneGroupQuantity == 1 or geneGroupQuantity == 2:
-        return [[[[1] * alleleQuantity] * geneGroupQuantity] * babyQuantity]
-    else:
-        answer = []
-        poleGeneQuantity = geneGroupQuantity // 3
-        for _ in range(poleGeneQuantity):
-            answer.append([[0] * alleleQuantity] * geneGroupQuantity)
-            answer.append([[2] * alleleQuantity] * geneGroupQuantity)
-        for _ in range(babyQuantity - poleGeneQuantity * 2):
-            answer.append([[1] * alleleQuantity] * geneGroupQuantity)
-        return answer
+    babies = []
+    temp_baby = []
+    for _ in range(babyQuantity):
+        for _ in range(geneGroupQuantity):
+            temp_baby.append(Gene_Generator(alleleQuantity, random.randint(0, alleleQuantity * 2)))
+        babies.append(temp_baby)
+        temp_baby = []   
+    return babies 
 
 # 將兩組2n基因組交配，回傳孩子的基因組
 # 兩個輸入須為list格式，記得兩者長度必須相同，而且兩者都是由0, 1, 2構成
@@ -351,7 +386,7 @@ def PrintBoard(board):
         print()
 
 
-# 糟糕分數計算機(不會引響版面)
+# 糟糕分數計算機(不會引響版面)(被FindBestMove使用)
 # block1 block2 為陣列 [type, rotation, location]
 def BadScoreCal(board, block1, block2, holeWeight, heightWeight, scoreWeight):
     testBoard = []
@@ -557,6 +592,7 @@ def MakeBabies(bestBabies: list, n: int):
 
 
 # =====================主程式========================
+# 輸入寶寶的基因組，測試的最大步數，
 def GetBabyScore(babyGene, maxMove, trialQuestion, currentProcess):
     weights = CalWeights(babyGene)
     currentScore = GetGeneScore(weights[0], weights[1], weights[2], maxMove, trialQuestion)
@@ -566,26 +602,31 @@ def GetBabyScore(babyGene, maxMove, trialQuestion, currentProcess):
 
 
 def GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion):
+    # 製作一個執行池(裡面有四個工作者)
     pool = Pool(4)
     inputs = []
+    # 變數管理器，管理執行多執行序的變數
     manager = multiprocessing.Manager()
+    # 做一個整數變數，管理者為manager，值為0
     currentProcess = manager.Value('i', 0)
+    # 將要輸入至GetBabyScore的資料先打包好，一一存入inputs
     for baby in babies:
         inputs.append((baby, maxMove, trialQuestion, currentProcess))
+    # 執行多執行序，輸出的資訊丟入pool_outputs(整數陣列)
     pool_outputs = pool.starmap(GetBabyScore, inputs)
     return pool_outputs
-
 
 if __name__ == '__main__':
     # maxMove 一個遊戲結算之步數
     # maxNo 一個子代生的數量
     # maxGeneration 要生幾個世代
-    # AlleleQuantity 個體之每個特徵等為基因數量
+    # alleleQuantity 個體之每個特徵等為基因數量
+    # bestBabiesQuantity 最後篩選出來的寶寶數量
     maxMove = 100
-    maxNo = 10
-    maxGeneration = 5
-    alleleQuantity = 5
-    bestBabiesQuantity = 3
+    maxNo = 50
+    maxGeneration = 10
+    alleleQuantity = 50
+    bestBabiesQuantity = 10
     bestBabies = []
 
     # 如果bestBabiesQuantity大於maxNo，將bestBabiesQuantity設為maxNo
@@ -605,6 +646,7 @@ if __name__ == '__main__':
 
     bestBabies = Make_First_Genes(alleleQuantity, 3, bestBabiesQuantity)  # 將準備要交配的寶寶產生出來
 
+    # print("best babies:", bestBabies)
     print("Initialize babies:", end="")
     for baby in bestBabies:
         print(CalWeights(baby), end="")
