@@ -432,7 +432,10 @@ def real_placing(type, rotation, location):
             vertical_movement(location, 4)
     pyautogui.press('space')
 
-
+# 輸入權重
+hole_weight = input("請輸入洞洞權重: ")
+height_weight = input("請輸入高度權重: ")
+score_weight = input("請輸入分數權重: ")
 # 製造俄羅斯板塊介面(TetrisBoard)，寬10高18
 # "-"為空白, "*"為有東西
 # 下面為示意圖
@@ -481,7 +484,7 @@ while True:
     current_Block = next_block
     next_block = scan_next_block(detect_next_block_location[0], detect_next_block_location[1])
     # 將現在版面最棒的步驟放入currentBestMove(不引響版面)
-    currentBestMove = FindBestMove(tetrisBoard, current_Block, next_block, 100, 100, 100)
+    currentBestMove = FindBestMove(tetrisBoard, current_Block, next_block, int(hole_weight), int(height_weight), int(score_weight))
     # 將回傳物列印出來
     print(currentBestMove)
     # 在虛擬版面中放置方塊
@@ -491,5 +494,5 @@ while True:
     # 列印方塊
     PrintBoard(tetrisBoard)
     # 停止一下，防止太快遊戲出錯
-    time.sleep(0.4)
+    time.sleep(0.5)
 

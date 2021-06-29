@@ -603,7 +603,7 @@ def GetBabyScore(babyGene, maxMove, trialQuestion, currentProcess):
 
 def GetBabiesScore_Multiprocessing(babies, maxMove, trialQuestion):
     # 製作一個執行池(裡面有四個工作者)
-    pool = Pool(4)
+    pool = Pool()
     inputs = []
     # 變數管理器，管理執行多執行序的變數
     manager = multiprocessing.Manager()
@@ -624,7 +624,7 @@ if __name__ == '__main__':
     # bestBabiesQuantity 最後篩選出來的寶寶數量
     maxMove = 100
     maxNo = 50
-    maxGeneration = 10
+    maxGeneration = 3
     alleleQuantity = 50
     bestBabiesQuantity = 10
     bestBabies = []
